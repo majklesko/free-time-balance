@@ -318,6 +318,7 @@
   <div id="jrnSummary"></div>
   <div class="jhead" id="jrnReflectHead"></div>
   <textarea id="jrnNote"></textarea>
+  <button class="pm-pin" id="jrnShare" style="display:none;margin-top:8px"></button>
   <div class="jhead" id="jrnPhotoHead" style="display:none"></div>
   <div class="mem-grid" id="memGrid"></div>
   <button class="jremove" id="jrnRemove" style="display:none"></button>
@@ -344,7 +345,7 @@ const I18N={
   somethingElse:"Something else here",close:"Close",logged:"Nice — your world noticed 🌱",
   nudgeTxt:c=>`${c} has gone a little quiet. Want a tiny idea to wake it up? (optional)`,nudgeLater:"Not now",nudgeOk:"Show me",
   memTitle:"My week",memSub:"Your moments and how your world has grown — only yours.",worldStory:"How your world has grown",memEmpty:"No photos yet. Add one when you log something 🌱",del:"×",
-  journey:"Journey",jSub:"Your story — your level, what you've built, and space to reflect. Only yours.",jLevel:"Level",jDays:"balanced days",jSummer:"This summer so far",jDaysShort:"days",jReflect:"My reflection",jNotePh:"Write a reflection — how's it going? any ideas?",jPhotos:"My photos",removeChild:"🗑 Remove this child",removeConfirm:n=>`Remove ${n}? This deletes their world on all devices.`,
+  journey:"Journey",jSub:"Your story — your level, what you've built, and space to reflect. Only yours.",jLevel:"Level",jDays:"balanced days",jSummer:"This summer so far",jDaysShort:"days",jReflect:"My reflection",jNotePh:"Write a reflection — how's it going? any ideas?",jPhotos:"My photos",shareYes:"👀 Sharing my week with a parent — tap to stop",shareNo:"🤝 Share my week with a parent",viewJourney:"👀 View journey",notShared:"not shared yet",removeChild:"🗑 Remove this child",removeConfirm:n=>`Remove ${n}? This deletes their world on all devices.`,
   manageKids:"Manage children",pinPrompt:"Parent PIN:",pinWrong:"Wrong PIN",pinSet:"🔒 Set a parent PIN",pinChange:"🔒 Change / remove PIN",pinSetPrompt:"Set a parent PIN (leave empty to remove it):",pinSaved:"Parent PIN set.",pinCleared:"Parent PIN removed.",
   lockNote:"📱 = lock THIS device to one child, so siblings can't open each other's world. Set a PIN to make it stick.",lockedMsg:n=>`This device now shows only ${n}. Come back here (Parent) to change it.`,unlockedMsg:"Device unlocked — all children visible.",
   pTitle:"Family view",pLead:"You see how the family is doing — not what each child did. By design.",
@@ -368,7 +369,7 @@ const I18N={
   somethingElse:"Niečo iné tu",close:"Zavrieť",logged:"Super — tvoj svet si to všimol 🌱",
   nudgeTxt:c=>`„${c}" trochu stíchlo. Chceš drobný nápad, ako to zobudiť? (nepovinné)`,nudgeLater:"Teraz nie",nudgeOk:"Ukáž",
   memTitle:"Môj týždeň",memSub:"Tvoje momenty a ako rástol tvoj svet — len tvoje.",worldStory:"Ako rástol tvoj svet",memEmpty:"Zatiaľ žiadne fotky. Pridaj, keď niečo zaznamenáš 🌱",del:"×",
-  journey:"Cesta",jSub:"Tvoj príbeh — tvoja úroveň, čo si postavil a priestor na reflexiu. Len tvoje.",jLevel:"Úroveň",jDays:"vyvážených dní",jSummer:"Toto leto zatiaľ",jDaysShort:"dní",jReflect:"Moja reflexia",jNotePh:"Napíš reflexiu — ako to ide? nejaké nápady?",jPhotos:"Moje fotky",removeChild:"🗑 Odstrániť dieťa",removeConfirm:n=>`Odstrániť ${n}? Vymaže to jeho svet na všetkých zariadeniach.`,
+  journey:"Cesta",jSub:"Tvoj príbeh — tvoja úroveň, čo si postavil a priestor na reflexiu. Len tvoje.",jLevel:"Úroveň",jDays:"vyvážených dní",jSummer:"Toto leto zatiaľ",jDaysShort:"dní",jReflect:"Moja reflexia",jNotePh:"Napíš reflexiu — ako to ide? nejaké nápady?",jPhotos:"Moje fotky",shareYes:"👀 Zdieľam svoj týždeň s rodičom — ťuk = prestať",shareNo:"🤝 Zdieľať svoj týždeň s rodičom",viewJourney:"👀 Pozri Cestu",notShared:"zatiaľ nezdieľané",removeChild:"🗑 Odstrániť dieťa",removeConfirm:n=>`Odstrániť ${n}? Vymaže to jeho svet na všetkých zariadeniach.`,
   manageKids:"Správa detí",pinPrompt:"Rodičovský PIN:",pinWrong:"Nesprávny PIN",pinSet:"🔒 Nastaviť rodičovský PIN",pinChange:"🔒 Zmeniť / zrušiť PIN",pinSetPrompt:"Nastav rodičovský PIN (prázdne = zrušiť):",pinSaved:"PIN nastavený.",pinCleared:"PIN zrušený.",
   lockNote:"📱 = uzamkni TOTO zariadenie na jedno dieťa, aby si súrodenci nevedeli otvoriť cudzí svet. Nastav PIN, nech to drží.",lockedMsg:n=>`Toto zariadenie teraz ukazuje len: ${n}. Zmeníš to tu (Rodič).`,unlockedMsg:"Zariadenie odomknuté — všetky deti viditeľné.",
   pTitle:"Pohľad rodiny",pLead:"Vidíš, ako sa darí rodine — nie čo ktoré dieťa robilo. Zámerne.",
@@ -660,8 +661,8 @@ function doLog(c,label){
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1700);}
 
 /* ===================== memories + world story (kid-only) ===================== */
-function openMem(){
-  const p=cur();
+function openMem(target){
+  const p=target||cur();const ro=MODE==="parent"; // parent views a child's shared journey read-only
   $("memTitle").textContent=`${p.name} · ${T().journey}`;$("memSub").textContent=T().jSub;$("memClose").textContent=T().close;
   const bd=balancedDays(p);const gp=bd.length;const reached=MILESTONES.filter(m=>gp>=m.at);
   // level
@@ -680,7 +681,8 @@ function openMem(){
     row.innerHTML=`<span class="su-i">${c.ico}</span><span class="su-n">${T()["cat_"+c.key]}</span><span class="su-d">${days} ${T().jDaysShort}</span>`;sm.appendChild(row);});
   // reflection note
   $("jrnReflectHead").textContent=T().jReflect;
-  const ta=$("jrnNote");ta.placeholder=T().jNotePh;ta.value=p.note||"";ta.oninput=()=>{p.note=ta.value;save();};
+  const ta=$("jrnNote");ta.placeholder=T().jNotePh;ta.value=p.note||"";ta.readOnly=ro;ta.oninput=ro?null:()=>{p.note=ta.value;save();};
+  const shb=$("jrnShare");if(ro){shb.style.display="none";}else{shb.style.display="block";shb.textContent=p.shared?T().shareYes:T().shareNo;shb.onclick=()=>{p.shared=!p.shared;save();shb.textContent=p.shared?T().shareYes:T().shareNo;};}
   // photos
   const g=$("memGrid");g.innerHTML="";
   const photos=p.logs.map((l,i)=>({l,i})).filter(x=>x.l.photo&&ageOf(x.l.date)<WINDOW_DAYS).reverse();
@@ -690,8 +692,8 @@ function openMem(){
     photos.forEach(({l,i})=>{const d=document.createElement("div");d.className="mem";
       const cap=(l.cap||T()["cat_"+l.cat])+(l.amt?(" · "+l.amt):"");
       const src=l.photo.startsWith("cloud:")?`${API}/f/${DB.familyId}/photo/${l.photo.slice(6)}`:l.photo;
-      d.innerHTML=`<button class="del">${T().del}</button><img src="${src}"/><div class="cap">${cap}</div>`;
-      d.querySelector(".del").onclick=()=>{p.logs[i].photo=null;save();openMem();};g.appendChild(d);});}
+      d.innerHTML=`${ro?"":'<button class="del">'+T().del+'</button>'}<img src="${src}"/><div class="cap">${cap}</div>`;
+      if(!ro){const db=d.querySelector(".del");if(db)db.onclick=()=>{p.logs[i].photo=null;save();openMem();};}g.appendChild(d);});}
   $("jrnRemove").style.display="none"; // profile management moved to Parent view
   $("memBg").classList.add("show");
 }
@@ -711,6 +713,7 @@ function renderParent(){
   const note=document.createElement("div");note.style.cssText="font-size:12px;color:var(--muted);margin-bottom:8px";note.textContent=T().lockNote;mg.appendChild(note);
   DB.profiles.forEach(p=>{const row=document.createElement("div");row.className="pm-row";
     row.innerHTML=`<span class="av" style="background:${p.color}">${p.name[0]}</span><span class="pm-n">${p.name}</span>`;
+    if(p.shared){const vw=document.createElement("button");vw.className="pm-lock";vw.textContent="👀";vw.title=T().viewJourney;vw.onclick=()=>openMem(p);row.appendChild(vw);}
     const lk=document.createElement("button");lk.className="pm-lock";lk.textContent=DB.lockedTo===p.id?"📱 ✓":"📱";
     lk.onclick=()=>{DB.lockedTo=(DB.lockedTo===p.id?null:p.id);localStorage.setItem(LS_KEY,JSON.stringify(DB));render();alert(DB.lockedTo?T().lockedMsg(p.name):T().unlockedMsg);};row.appendChild(lk);
     if(DB.profiles.length>1){const del=document.createElement("button");del.className="pm-del";del.textContent="🗑";del.onclick=()=>deleteProfile(p.id);row.appendChild(del);}
