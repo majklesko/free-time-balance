@@ -38,6 +38,8 @@
   .brand{font-weight:800;font-size:20px}.brand .dot{color:#f6a623}.spacer{flex:1}
   .chip{border:none;background:rgba(255,255,255,.72);backdrop-filter:blur(6px);padding:8px 12px;border-radius:999px;font:inherit;font-size:13px;cursor:pointer;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.06)}
   .chip:hover{background:#fff}.chip.on{background:#f6a623;color:#fff}
+  .morelist{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
+  #moreBg .chip{width:100%;justify-content:flex-start;border-radius:12px;padding:12px 14px;background:#f6f7f9;font-size:15px}
   .who{font-size:14px;color:var(--muted);margin:2px 0 12px}
   .profiles{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
   .pfile{border:none;cursor:pointer;font:inherit;background:var(--card);border-radius:16px;padding:10px 14px;box-shadow:var(--shadow);display:flex;align-items:center;gap:9px;font-weight:600}
@@ -184,17 +186,10 @@
 <div class="wrap">
   <div class="printhead"><h1 id="ph-title">My World</h1><p id="ph-sub">Colour a region every time you do something there.</p></div>
   <header class="topbar">
-    <div class="brand">🌍 <span id="brand">your world</span><span class="dot">.</span></div>
+    <div class="brand">🌍 <span id="brand">Habitat</span><span class="dot">.</span></div>
     <div class="spacer"></div>
-    <button class="chip" id="memBtn">🖼️ <span id="memLbl">My week</span></button>
-    <button class="chip" id="familyBtn">👪 <span id="familyLbl">Family</span></button>
-    <button class="chip" id="strygaBtn">🧙‍♀️ <span id="strygaLbl">Visitor</span></button>
-    <button class="chip" id="minBtn">📋 <span id="minLbl">Simple</span></button>
-    <button class="chip" id="installBtn" style="display:none">⬇️ <span id="installLbl">Install</span></button>
-    <button class="chip" id="updateBtn">🔄 <span id="updateLbl">Update</span></button>
-    <button class="chip" id="langBtn">SK</button>
-    <button class="chip" id="printBtn">🖨️ <span id="printLbl">Print</span></button>
-    <button class="chip" id="modeBtn">👋 <span id="modeLbl">Parent</span></button>
+    <button class="chip" id="memBtn">📖 <span id="memLbl">Journey</span></button>
+    <button class="chip" id="moreBtn">⚙️ <span id="moreLbl">More</span></button>
   </header>
   <div class="who" id="who"></div>
   <div id="famHint" style="display:none;background:#eaf3ff;border:1px solid #bcd8f7;border-radius:12px;padding:10px 12px;margin:0 0 10px;font-size:13px;color:#2b4a6b;cursor:pointer"></div>
@@ -301,6 +296,21 @@
   <button class="close" id="sheetClose"></button>
 </div></div>
 
+<div class="ov" id="moreBg"><div class="sheet">
+  <h3 id="moreTitle"></h3>
+  <div class="morelist">
+    <button class="chip" id="modeBtn">👋 <span id="modeLbl">Parent</span></button>
+    <button class="chip" id="familyBtn">👪 <span id="familyLbl">Family</span></button>
+    <button class="chip" id="minBtn">📋 <span id="minLbl">Simple</span></button>
+    <button class="chip" id="strygaBtn">🧙‍♀️ <span id="strygaLbl">Visitor</span></button>
+    <button class="chip" id="langBtn">SK</button>
+    <button class="chip" id="printBtn">🖨️ <span id="printLbl">Print</span></button>
+    <button class="chip" id="installBtn" style="display:none">⬇️ <span id="installLbl">Install</span></button>
+    <button class="chip" id="updateBtn">🔄 <span id="updateLbl">Update</span></button>
+  </div>
+  <button class="close" id="moreClose"></button>
+</div></div>
+
 <div class="ov" id="famBg"><div class="sheet">
   <h3 id="famTitle"></h3><div class="sub" id="famSub"></div>
   <div id="famLink" style="word-break:break-all;background:#f4f6f9;border-radius:10px;padding:10px;font-size:13px;margin-bottom:12px"></div>
@@ -333,7 +343,7 @@
 const I18N={
  en:{brand:"Habitat",print:"Print",parent:"Parent",child:"Kids",simple:"Simple",world:"World",myweek:"My week",today:"today",
   hello:n=>`Hi ${n} 👋 — this is your world today`,addChild:"＋ Add child",addChildPrompt:"Child's name:",
-  family:"Family",familyMsg:"Link copied ✓",update:"Update",install:"Install",iosInstall:"On iPhone: tap Share ⬆️ in Safari's bottom bar, then 'Add to Home Screen'.",
+  family:"Family",familyMsg:"Link copied ✓",update:"Update",install:"Install",more:"More",moreTitle:"Settings",iosInstall:"On iPhone: tap Share ⬆️ in Safari's bottom bar, then 'Add to Home Screen'.",
   famTitle:"Your family",famSub:"Share this link so your family's phones see the same worlds.",famShareBtn:"📤 Share link",famCopied:"Link copied ✓",famJoinLbl:"Join another family (paste its link or code):",famJoinBtn:"Join",famHint:"👪 Have a family already? Tap here and enter your family code to load your children.",
   cat_home:"Helping at home",cat_space:"My space",cat_family:"Family",cat_friends:"Friends",cat_learn:"Learning",cat_self:"Time for me",cat_sport:"Moving",
   st_vibrant:"thriving",st_ok:"awake",st_sleepy:"sleeping…",
@@ -357,7 +367,7 @@ const I18N={
   activities:{home:["Took out the trash","Emptied the dishwasher","Helped cook","Tidied a shared space"],space:["Tidied my room","Made my bed","Sorted my desk","Vacuumed my space"],family:["Played with my sibling","Helped a family member","Hung out with family","Did something kind at home"],friends:["Met a friend","Called / messaged a friend","Did something fun together","Made a new friend"],learn:["Learned something new","Read","Practiced a skill","Made/built something"],self:["I made time for myself","Did something just for me","Relaxed & recharged"],sport:["Went outside & moved","Played a sport","Walked / biked","Trained"]}},
  sk:{brand:"Habitat",print:"Tlač",parent:"Rodič",child:"Deti",simple:"Jednoducho",world:"Svet",myweek:"Môj týždeň",today:"dnes",
   hello:n=>`Ahoj ${n} 👋 — toto je dnes tvoj svet`,addChild:"＋ Pridaj dieťa",addChildPrompt:"Meno dieťaťa:",
-  family:"Rodina",familyMsg:"Link skopírovaný ✓",update:"Aktualizovať",install:"Inštalovať",iosInstall:"Na iPhone: klikni Zdieľať ⬆️ v spodnej lište Safari a potom 'Pridať na plochu'.",
+  family:"Rodina",familyMsg:"Link skopírovaný ✓",update:"Aktualizovať",install:"Inštalovať",more:"Viac",moreTitle:"Nastavenia",iosInstall:"Na iPhone: klikni Zdieľať ⬆️ v spodnej lište Safari a potom 'Pridať na plochu'.",
   famTitle:"Vaša rodina",famSub:"Pošli tento link, nech telefóny rodiny vidia tie isté svety.",famShareBtn:"📤 Zdieľať link",famCopied:"Link skopírovaný ✓",famJoinLbl:"Pripojiť sa k inej rodine (vlož link alebo kód):",famJoinBtn:"Pripojiť",famHint:"👪 Už máš rodinu? Klikni sem a zadaj rodinný kód, načítajú sa tvoje deti.",
   cat_home:"Pomoc doma",cat_space:"Môj priestor",cat_family:"Rodina",cat_friends:"Kamoši",cat_learn:"Učenie",cat_self:"Čas pre mňa",cat_sport:"Pohyb",
   st_vibrant:"prekvitá",st_ok:"bdie",st_sleepy:"spí…",
@@ -490,7 +500,7 @@ function render(){
   LANG=DB.lang;
   $("brand").textContent=T().brand;$("printLbl").textContent=T().print;
   $("langBtn").textContent=LANG==="en"?"SK":"EN";$("modeLbl").textContent=MODE==="child"?T().parent:T().child;
-  $("memLbl").textContent=T().journey;$("familyLbl").textContent=T().family;$("installLbl").textContent=T().install;$("updateLbl").textContent=T().update;$("footnote").textContent=T().footnote;
+  $("memLbl").textContent=T().journey;$("familyLbl").textContent=T().family;$("installLbl").textContent=T().install;$("updateLbl").textContent=T().update;$("moreLbl").textContent=T().more;$("footnote").textContent=T().footnote;
   $("ph-title").textContent=T().ph_title;$("ph-sub").textContent=T().ph_sub;
   if(MODE==="parent"){$("childView").style.display="none";$("parentView").style.display="block";
     $("profiles").style.display="none";$("memBtn").style.display="none";$("minBtn").style.display="none";$("strygaBtn").style.display="none";$("who").textContent="";renderParent();return;}
@@ -559,7 +569,7 @@ function renderGrown(p){
   const g=$("grown");const gp=growth(p);const reached=MILESTONES.filter(m=>gp>=m.at);const ts=todayState(p);
   let head=reached.length===0?T().grownNone:`${T().grownPre} <b>${reached.map(m=>LANG==="sk"?m.sk:m.en).join(" · ")}</b>`;
   let hint=ts.sameY?` · ${T().varyHint}`:(ts.distinct>0&&ts.distinct<BALANCE_MIN?` · ${T().today} ${ts.distinct}/3`:"");
-  g.innerHTML=head+hint;g.onclick=openMem;renderJourney(gp);
+  g.innerHTML=head+hint;g.onclick=()=>openMem();renderJourney(gp);
 }
 function renderJourney(gp){
   const j=$("journey");if(!j)return;j.innerHTML="";let nextShown=false;
@@ -732,7 +742,10 @@ function setPin(){const v=prompt(T().pinSetPrompt,DB.pin||"");if(v===null)return
 $("minBtn").onclick=()=>{const p=cur();p.minimal=!p.minimal;save();render();};
 $("strygaBtn").onclick=()=>{const p=cur();p.stryga=(p.stryga===false);save();render();};
 $("printBtn").onclick=()=>window.print();
-$("memBtn").onclick=openMem;
+$("memBtn").onclick=()=>openMem();
+$("moreBtn").onclick=()=>{$("moreTitle").textContent=T().moreTitle;$("moreBg").classList.add("show");};
+$("moreClose").onclick=()=>$("moreBg").classList.remove("show");
+$("moreBg").addEventListener("click",e=>{const b=e.target.closest("button");if(b&&b.id!=="moreClose")setTimeout(()=>$("moreBg").classList.remove("show"),80);});
 function famLink(){return `${location.origin}${location.pathname}?family=${DB.familyId}`;}
 $("familyBtn").onclick=()=>{
   $("famTitle").textContent=T().famTitle;$("famSub").textContent=T().famSub;$("famLink").textContent=famLink();
@@ -747,7 +760,7 @@ $("famJoinBtn").onclick=()=>{const v=$("famJoinInput").value||"";const m=v.match
   if(code&&code.length>=12&&code!==DB.familyId){DB.familyId=code;save();$("famBg").classList.remove("show");syncPull();}};
 $("famClose").onclick=()=>$("famBg").classList.remove("show");
 $("sheetClose").onclick=closeSheet;$("memClose").onclick=()=>$("memBg").classList.remove("show");
-["sheetBg","memBg","famBg"].forEach(id=>$(id).onclick=e=>{if(e.target===$(id))$(id).classList.remove("show");});
+["sheetBg","memBg","famBg","moreBg"].forEach(id=>$(id).onclick=e=>{if(e.target===$(id))$(id).classList.remove("show");});
 
 /* demo seed — 10 varied balanced days (no same trio two days running) + partial today */
 if(!DB._seeded){
