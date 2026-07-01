@@ -191,6 +191,7 @@
     <button class="chip" id="strygaBtn">🧙‍♀️ <span id="strygaLbl">Visitor</span></button>
     <button class="chip" id="minBtn">📋 <span id="minLbl">Simple</span></button>
     <button class="chip" id="installBtn" style="display:none">⬇️ <span id="installLbl">Install</span></button>
+    <button class="chip" id="updateBtn">🔄 <span id="updateLbl">Update</span></button>
     <button class="chip" id="langBtn">SK</button>
     <button class="chip" id="printBtn">🖨️ <span id="printLbl">Print</span></button>
     <button class="chip" id="modeBtn">👋 <span id="modeLbl">Parent</span></button>
@@ -331,7 +332,7 @@
 const I18N={
  en:{brand:"Habitat",print:"Print",parent:"Parent",child:"Kids",simple:"Simple",world:"World",myweek:"My week",today:"today",
   hello:n=>`Hi ${n} 👋 — this is your world today`,addChild:"＋ Add child",addChildPrompt:"Child's name:",
-  family:"Family",familyMsg:"Link copied ✓",install:"Install",iosInstall:"On iPhone: tap Share ⬆️ in Safari's bottom bar, then 'Add to Home Screen'.",
+  family:"Family",familyMsg:"Link copied ✓",update:"Update",install:"Install",iosInstall:"On iPhone: tap Share ⬆️ in Safari's bottom bar, then 'Add to Home Screen'.",
   famTitle:"Your family",famSub:"Share this link so your family's phones see the same worlds.",famShareBtn:"📤 Share link",famCopied:"Link copied ✓",famJoinLbl:"Join another family (paste its link or code):",famJoinBtn:"Join",famHint:"👪 Have a family already? Tap here and enter your family code to load your children.",
   cat_home:"Helping at home",cat_space:"My space",cat_family:"Family",cat_friends:"Friends",cat_learn:"Learning",cat_self:"Time for me",cat_sport:"Moving",
   st_vibrant:"thriving",st_ok:"awake",st_sleepy:"sleeping…",
@@ -355,7 +356,7 @@ const I18N={
   activities:{home:["Took out the trash","Emptied the dishwasher","Helped cook","Tidied a shared space"],space:["Tidied my room","Made my bed","Sorted my desk","Vacuumed my space"],family:["Played with my sibling","Helped a family member","Hung out with family","Did something kind at home"],friends:["Met a friend","Called / messaged a friend","Did something fun together","Made a new friend"],learn:["Learned something new","Read","Practiced a skill","Made/built something"],self:["I made time for myself","Did something just for me","Relaxed & recharged"],sport:["Went outside & moved","Played a sport","Walked / biked","Trained"]}},
  sk:{brand:"Habitat",print:"Tlač",parent:"Rodič",child:"Deti",simple:"Jednoducho",world:"Svet",myweek:"Môj týždeň",today:"dnes",
   hello:n=>`Ahoj ${n} 👋 — toto je dnes tvoj svet`,addChild:"＋ Pridaj dieťa",addChildPrompt:"Meno dieťaťa:",
-  family:"Rodina",familyMsg:"Link skopírovaný ✓",install:"Inštalovať",iosInstall:"Na iPhone: klikni Zdieľať ⬆️ v spodnej lište Safari a potom 'Pridať na plochu'.",
+  family:"Rodina",familyMsg:"Link skopírovaný ✓",update:"Aktualizovať",install:"Inštalovať",iosInstall:"Na iPhone: klikni Zdieľať ⬆️ v spodnej lište Safari a potom 'Pridať na plochu'.",
   famTitle:"Vaša rodina",famSub:"Pošli tento link, nech telefóny rodiny vidia tie isté svety.",famShareBtn:"📤 Zdieľať link",famCopied:"Link skopírovaný ✓",famJoinLbl:"Pripojiť sa k inej rodine (vlož link alebo kód):",famJoinBtn:"Pripojiť",famHint:"👪 Už máš rodinu? Klikni sem a zadaj rodinný kód, načítajú sa tvoje deti.",
   cat_home:"Pomoc doma",cat_space:"Môj priestor",cat_family:"Rodina",cat_friends:"Kamoši",cat_learn:"Učenie",cat_self:"Čas pre mňa",cat_sport:"Pohyb",
   st_vibrant:"prekvitá",st_ok:"bdie",st_sleepy:"spí…",
@@ -488,7 +489,7 @@ function render(){
   LANG=DB.lang;
   $("brand").textContent=T().brand;$("printLbl").textContent=T().print;
   $("langBtn").textContent=LANG==="en"?"SK":"EN";$("modeLbl").textContent=MODE==="child"?T().parent:T().child;
-  $("memLbl").textContent=T().journey;$("familyLbl").textContent=T().family;$("installLbl").textContent=T().install;$("footnote").textContent=T().footnote;
+  $("memLbl").textContent=T().journey;$("familyLbl").textContent=T().family;$("installLbl").textContent=T().install;$("updateLbl").textContent=T().update;$("footnote").textContent=T().footnote;
   $("ph-title").textContent=T().ph_title;$("ph-sub").textContent=T().ph_sub;
   if(MODE==="parent"){$("childView").style.display="none";$("parentView").style.display="block";
     $("profiles").style.display="none";$("memBtn").style.display="none";$("minBtn").style.display="none";$("strygaBtn").style.display="none";$("who").textContent="";renderParent();return;}
@@ -758,7 +759,18 @@ if(!DB._seeded){
   DB._seeded=true;save();
 }
 render();ensureScenery();syncPull();
-if("serviceWorker" in navigator){try{navigator.serviceWorker.register("sw.js");}catch(e){}}
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js").then(r=>{try{r.update();}catch(e){}}).catch(()=>{});
+  let _refreshing=false;
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(_refreshing)return;_refreshing=true;location.reload();});
+  // check for a newer version when app returns to foreground (iOS-friendly)
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden)navigator.serviceWorker.getRegistration().then(r=>r&&r.update()).catch(()=>{});});
+}
+$("updateBtn").onclick=async()=>{
+  try{const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}catch(e){}
+  try{const r=await navigator.serviceWorker.getRegistration();if(r)await r.update();}catch(e){}
+  location.reload();
+};
 // in-app install button (Chrome/Android via beforeinstallprompt; iOS shows instructions)
 let deferredPrompt=null;
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("installBtn").style.display="";});
