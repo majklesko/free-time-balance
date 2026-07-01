@@ -196,6 +196,7 @@
     <button class="chip" id="modeBtn">👋 <span id="modeLbl">Parent</span></button>
   </header>
   <div class="who" id="who"></div>
+  <div id="famHint" style="display:none;background:#eaf3ff;border:1px solid #bcd8f7;border-radius:12px;padding:10px 12px;margin:0 0 10px;font-size:13px;color:#2b4a6b;cursor:pointer"></div>
   <div class="profiles" id="profiles"></div>
 
   <section id="childView">
@@ -331,7 +332,7 @@ const I18N={
  en:{brand:"Habitat",print:"Print",parent:"Parent",child:"Kids",simple:"Simple",world:"World",myweek:"My week",today:"today",
   hello:n=>`Hi ${n} 👋 — this is your world today`,addChild:"＋ Add child",addChildPrompt:"Child's name:",
   family:"Family",familyMsg:"Link copied ✓",install:"Install",iosInstall:"On iPhone: tap Share ⬆️ in Safari's bottom bar, then 'Add to Home Screen'.",
-  famTitle:"Your family",famSub:"Share this link so your family's phones see the same worlds.",famShareBtn:"📤 Share link",famCopied:"Link copied ✓",famJoinLbl:"Join another family (paste its link or code):",famJoinBtn:"Join",
+  famTitle:"Your family",famSub:"Share this link so your family's phones see the same worlds.",famShareBtn:"📤 Share link",famCopied:"Link copied ✓",famJoinLbl:"Join another family (paste its link or code):",famJoinBtn:"Join",famHint:"👪 Have a family already? Tap here and enter your family code to load your children.",
   cat_home:"Helping at home",cat_space:"My space",cat_family:"Family",cat_friends:"Friends",cat_learn:"Learning",cat_self:"Time for me",cat_sport:"Moving",
   st_vibrant:"thriving",st_ok:"awake",st_sleepy:"sleeping…",
   worldGreat:"Your world is glowing 🌞",worldGood:"Your world looks happy 🙂",worldMixed:"A corner is getting sleepy 🌙",worldQuiet:"Your world is quiet — wake a corner when you like 🌙",
@@ -355,7 +356,7 @@ const I18N={
  sk:{brand:"Habitat",print:"Tlač",parent:"Rodič",child:"Deti",simple:"Jednoducho",world:"Svet",myweek:"Môj týždeň",today:"dnes",
   hello:n=>`Ahoj ${n} 👋 — toto je dnes tvoj svet`,addChild:"＋ Pridaj dieťa",addChildPrompt:"Meno dieťaťa:",
   family:"Rodina",familyMsg:"Link skopírovaný ✓",install:"Inštalovať",iosInstall:"Na iPhone: klikni Zdieľať ⬆️ v spodnej lište Safari a potom 'Pridať na plochu'.",
-  famTitle:"Vaša rodina",famSub:"Pošli tento link, nech telefóny rodiny vidia tie isté svety.",famShareBtn:"📤 Zdieľať link",famCopied:"Link skopírovaný ✓",famJoinLbl:"Pripojiť sa k inej rodine (vlož link alebo kód):",famJoinBtn:"Pripojiť",
+  famTitle:"Vaša rodina",famSub:"Pošli tento link, nech telefóny rodiny vidia tie isté svety.",famShareBtn:"📤 Zdieľať link",famCopied:"Link skopírovaný ✓",famJoinLbl:"Pripojiť sa k inej rodine (vlož link alebo kód):",famJoinBtn:"Pripojiť",famHint:"👪 Už máš rodinu? Klikni sem a zadaj rodinný kód, načítajú sa tvoje deti.",
   cat_home:"Pomoc doma",cat_space:"Môj priestor",cat_family:"Rodina",cat_friends:"Kamoši",cat_learn:"Učenie",cat_self:"Čas pre mňa",cat_sport:"Pohyb",
   st_vibrant:"prekvitá",st_ok:"bdie",st_sleepy:"spí…",
   worldGreat:"Tvoj svet žiari 🌞",worldGood:"Tvoj svet vyzerá spokojne 🙂",worldMixed:"Jeden kútik zaspáva 🌙",worldQuiet:"Tvoj svet je tichý — zobuď kútik, keď chceš 🌙",
@@ -496,6 +497,8 @@ function render(){
   else{DB.lockedTo=null;$("profiles").style.display="flex";renderProfiles();}
   const p=cur();
   $("who").textContent=T().hello(p.name);
+  const demo=DB.profiles.some(x=>["alex","sam","mia"].includes(x.id));
+  const fh=$("famHint");fh.style.display=demo?"block":"none";fh.textContent=T().famHint;fh.onclick=()=>$("familyBtn").click();
   $("minBtn").classList.toggle("on",!!p.minimal);$("minLbl").textContent=p.minimal?T().world:T().simple;
   $("strygaBtn").classList.toggle("on",p.stryga!==false);$("strygaLbl").textContent=T().visitor;
   if(p.minimal){$("stage").style.display="none";$("mlist").style.display="block";renderList(p);}
