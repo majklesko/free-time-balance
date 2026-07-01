@@ -442,8 +442,9 @@ const save=()=>{localStorage.setItem(LS_KEY,JSON.stringify(DB));
   if(API){clearTimeout(pushTimer);pushTimer=setTimeout(()=>syncPush(cur()),800);}};
 async function syncPush(p){if(!API||!p)return;try{await fetch(`${API}/f/${DB.familyId}/p/${p.id}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});}catch(e){}}
 async function syncPull(){if(!API)return;try{const r=await fetch(`${API}/f/${DB.familyId}`);if(!r.ok)return;const d=await r.json();
-  if(d.profiles&&d.profiles.length){const byId={};DB.profiles.forEach(p=>byId[p.id]=p);d.profiles.forEach(p=>byId[p.id]=p);
-    DB.profiles=Object.values(byId);if(!DB.profiles.find(p=>p.id===DB.current))DB.current=DB.profiles[0].id;
+  if(d.profiles&&d.profiles.length){
+    DB.profiles=d.profiles; // cloud is the source of truth for family membership (so deletions propagate)
+    if(!DB.profiles.find(p=>p.id===DB.current))DB.current=DB.profiles[0].id;
     localStorage.setItem(LS_KEY,JSON.stringify(DB));render();}
   else{DB.profiles.forEach(syncPush);}}catch(e){}}
 let MODE="child",LANG=DB.lang;
@@ -522,8 +523,8 @@ function renderProfiles(){const b=$("profiles");b.innerHTML="";DB.profiles.forEa
   e.onclick=()=>{DB.current=p.id;save();render();};b.appendChild(e);});}
 function addChild(){const name=prompt(T().addChildPrompt,"");if(!name||!name.trim())return;
   const id="k"+DB.profiles.length+Math.floor(performance.now());
-  DB.profiles.push({id,name:name.trim(),color:PALETTE[DB.profiles.length%PALETTE.length],minimal:false,stryga:true,logs:[],acts:{}});
-  DB.current=id;save();render();}
+  const np={id,name:name.trim(),color:PALETTE[DB.profiles.length%PALETTE.length],minimal:false,stryga:true,logs:[],acts:{}};
+  DB.profiles.push(np);DB.current=id;save();syncPush(np);render();}
 async function deleteProfile(pid){
   if(DB.profiles.length<=1)return;
   const p=DB.profiles.find(x=>x.id===pid);
@@ -780,7 +781,7 @@ if("serviceWorker" in navigator){
   let _refreshing=false;
   navigator.serviceWorker.addEventListener("controllerchange",()=>{if(_refreshing)return;_refreshing=true;location.reload();});
   // check for a newer version when app returns to foreground (iOS-friendly)
-  document.addEventListener("visibilitychange",()=>{if(!document.hidden)navigator.serviceWorker.getRegistration().then(r=>r&&r.update()).catch(()=>{});});
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden){navigator.serviceWorker.getRegistration().then(r=>r&&r.update()).catch(()=>{});syncPull();}});
 }
 $("updateBtn").onclick=async()=>{
   try{const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}catch(e){}
