@@ -1,0 +1,14 @@
+{
+  "name": "Habitat",
+  "short_name": "Habitat",
+  "description": "Grow a balanced life.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#cfe9ff",
+  "theme_color": "#cfe9ff",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

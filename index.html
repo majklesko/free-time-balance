@@ -4,6 +4,12 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Habitat — grow a balanced life</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#cfe9ff" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Habitat" />
+<link rel="apple-touch-icon" href="icon.svg" />
+<link rel="icon" href="icon.svg" />
 <!--
   Free Time Balance — clickable prototype v3 (working name placeholder). Spec FTB-20260628-001.
   Panel-approved mechanics:
@@ -148,6 +154,7 @@
   .sum-row{display:flex;align-items:center;gap:10px;font-size:13px;padding:5px 0;border-bottom:1px dashed #f0f1f4}
   .sum-row .su-i{font-size:17px}.sum-row .su-n{flex:1}.sum-row .su-d{color:var(--muted)}
   #jrnNote{width:100%;min-height:64px;border:1px solid #e6e8ee;border-radius:12px;padding:10px;font:inherit;font-size:14px;margin-top:4px;resize:vertical}
+  .jremove{margin-top:14px;width:100%;background:transparent;border:1px solid #f0d2d2;color:#b4566a;border-radius:12px;padding:9px;font:inherit;font-size:13px;cursor:pointer}
 
   .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);opacity:0;background:#222838;color:#fff;padding:12px 18px;border-radius:999px;font-size:14px;z-index:40;transition:.35s;pointer-events:none}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
@@ -292,6 +299,7 @@
   <textarea id="jrnNote"></textarea>
   <div class="jhead" id="jrnPhotoHead" style="display:none"></div>
   <div class="mem-grid" id="memGrid"></div>
+  <button class="jremove" id="jrnRemove" style="display:none"></button>
   <button class="close" id="memClose"></button>
 </div></div>
 
@@ -303,7 +311,7 @@
 const I18N={
  en:{brand:"Habitat",print:"Print",parent:"Parent",child:"Kids",simple:"Simple",world:"World",myweek:"My week",today:"today",
   hello:n=>`Hi ${n} 👋 — this is your world today`,addChild:"＋ Add child",addChildPrompt:"Child's name:",
-  family:"Family",familyMsg:"Your family code — share it with your family's OTHER devices so they see the same worlds. To join another family, paste its code here:",
+  family:"Family",familyMsg:"Link copied ✓ — share it in WhatsApp so your family joins this same world. To switch to another family, paste its link or code here:",
   cat_home:"Helping at home",cat_space:"My space",cat_family:"Family",cat_friends:"Friends",cat_learn:"Learning",cat_self:"Time for me",cat_sport:"Moving",
   st_vibrant:"thriving",st_ok:"awake",st_sleepy:"sleeping…",
   worldGreat:"Your world is glowing 🌞",worldGood:"Your world looks happy 🙂",worldMixed:"A corner is getting sleepy 🌙",worldQuiet:"Your world is quiet — wake a corner when you like 🌙",
@@ -314,7 +322,7 @@ const I18N={
   somethingElse:"Something else here",close:"Close",logged:"Nice — your world noticed 🌱",
   nudgeTxt:c=>`${c} has gone a little quiet. Want a tiny idea to wake it up? (optional)`,nudgeLater:"Not now",nudgeOk:"Show me",
   memTitle:"My week",memSub:"Your moments and how your world has grown — only yours.",worldStory:"How your world has grown",memEmpty:"No photos yet. Add one when you log something 🌱",del:"×",
-  journey:"Journey",jSub:"Your story — your level, what you've built, and space to reflect. Only yours.",jLevel:"Level",jDays:"balanced days",jSummer:"This summer so far",jDaysShort:"days",jReflect:"My reflection",jNotePh:"Write a reflection — how's it going? any ideas?",jPhotos:"My photos",
+  journey:"Journey",jSub:"Your story — your level, what you've built, and space to reflect. Only yours.",jLevel:"Level",jDays:"balanced days",jSummer:"This summer so far",jDaysShort:"days",jReflect:"My reflection",jNotePh:"Write a reflection — how's it going? any ideas?",jPhotos:"My photos",removeChild:"🗑 Remove this child",removeConfirm:n=>`Remove ${n}? This deletes their world on all devices.`,
   pTitle:"Family view",pLead:"You see how the family is doing — not what each child did. By design.",
   sigGood:"The family's world looks healthy",sigGoodSub:"Everyone has a few corners awake. Nothing to do.",sigQuiet:"One area is a little quiet across the family",sigQuietSub:"No action needed — it usually wakes up on its own.",
   ydTitle:"🎉 This has been a lovely balanced stretch.",ydBody:"Maybe a moment for a surprise Yes Day together? (Not earned, not owed — just a celebration.)",
@@ -324,7 +332,7 @@ const I18N={
   activities:{home:["Took out the trash","Emptied the dishwasher","Helped cook","Tidied a shared space"],space:["Tidied my room","Made my bed","Sorted my desk","Vacuumed my space"],family:["Played with my sibling","Helped a family member","Hung out with family","Did something kind at home"],friends:["Met a friend","Called / messaged a friend","Did something fun together","Made a new friend"],learn:["Learned something new","Read","Practiced a skill","Made/built something"],self:["I made time for myself","Did something just for me","Relaxed & recharged"],sport:["Went outside & moved","Played a sport","Walked / biked","Trained"]}},
  sk:{brand:"Habitat",print:"Tlač",parent:"Rodič",child:"Deti",simple:"Jednoducho",world:"Svet",myweek:"Môj týždeň",today:"dnes",
   hello:n=>`Ahoj ${n} 👋 — toto je dnes tvoj svet`,addChild:"＋ Pridaj dieťa",addChildPrompt:"Meno dieťaťa:",
-  family:"Rodina",familyMsg:"Kód rodiny — pošli ho na OSTATNÉ zariadenia rodiny, nech vidia tie isté svety. Ak sa chceš pripojiť k inej rodine, vlož jej kód sem:",
+  family:"Rodina",familyMsg:"Link skopírovaný ✓ — pošli ho vo WhatsApp, nech sa rodina pripojí k tomu istému svetu. Ak chceš prejsť k inej rodine, vlož jej link alebo kód sem:",
   cat_home:"Pomoc doma",cat_space:"Môj priestor",cat_family:"Rodina",cat_friends:"Kamoši",cat_learn:"Učenie",cat_self:"Čas pre mňa",cat_sport:"Pohyb",
   st_vibrant:"prekvitá",st_ok:"bdie",st_sleepy:"spí…",
   worldGreat:"Tvoj svet žiari 🌞",worldGood:"Tvoj svet vyzerá spokojne 🙂",worldMixed:"Jeden kútik zaspáva 🌙",worldQuiet:"Tvoj svet je tichý — zobuď kútik, keď chceš 🌙",
@@ -335,7 +343,7 @@ const I18N={
   somethingElse:"Niečo iné tu",close:"Zavrieť",logged:"Super — tvoj svet si to všimol 🌱",
   nudgeTxt:c=>`„${c}" trochu stíchlo. Chceš drobný nápad, ako to zobudiť? (nepovinné)`,nudgeLater:"Teraz nie",nudgeOk:"Ukáž",
   memTitle:"Môj týždeň",memSub:"Tvoje momenty a ako rástol tvoj svet — len tvoje.",worldStory:"Ako rástol tvoj svet",memEmpty:"Zatiaľ žiadne fotky. Pridaj, keď niečo zaznamenáš 🌱",del:"×",
-  journey:"Cesta",jSub:"Tvoj príbeh — tvoja úroveň, čo si postavil a priestor na reflexiu. Len tvoje.",jLevel:"Úroveň",jDays:"vyvážených dní",jSummer:"Toto leto zatiaľ",jDaysShort:"dní",jReflect:"Moja reflexia",jNotePh:"Napíš reflexiu — ako to ide? nejaké nápady?",jPhotos:"Moje fotky",
+  journey:"Cesta",jSub:"Tvoj príbeh — tvoja úroveň, čo si postavil a priestor na reflexiu. Len tvoje.",jLevel:"Úroveň",jDays:"vyvážených dní",jSummer:"Toto leto zatiaľ",jDaysShort:"dní",jReflect:"Moja reflexia",jNotePh:"Napíš reflexiu — ako to ide? nejaké nápady?",jPhotos:"Moje fotky",removeChild:"🗑 Odstrániť dieťa",removeConfirm:n=>`Odstrániť ${n}? Vymaže to jeho svet na všetkých zariadeniach.`,
   pTitle:"Pohľad rodiny",pLead:"Vidíš, ako sa darí rodine — nie čo ktoré dieťa robilo. Zámerne.",
   sigGood:"Svet rodiny vyzerá zdravo",sigGoodSub:"Každý má pár kútikov bdelých. Netreba nič.",sigQuiet:"Jedna oblasť je v rodine trochu tichá",sigQuietSub:"Netreba zasahovať — zvyčajne sa zobudí sama.",
   ydTitle:"🎉 Toto bolo pekné vyvážené obdobie.",ydBody:"Možno chvíľa na prekvapivý spoločný Yes Day? (Nie zaslúžený, nie dlžný — len oslava.)",
@@ -387,6 +395,10 @@ if(!DB.current)DB.current=DB.profiles[0].id;
 // ---- Cloudflare sync (Worker + KV) ----
 const API="https://habitat.michal-4ea.workers.dev";
 if(!DB.familyId)DB.familyId="fam-"+Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,8);
+// deep link: ?family=<code> auto-joins that family (shareable via WhatsApp)
+const _fam=new URLSearchParams(location.search).get("family");
+if(_fam&&_fam.length>=12)DB.familyId=_fam;
+localStorage.setItem(LS_KEY,JSON.stringify(DB));
 let pushTimer=null;
 const save=()=>{localStorage.setItem(LS_KEY,JSON.stringify(DB));
   if(API){clearTimeout(pushTimer);pushTimer=setTimeout(()=>syncPush(cur()),800);}};
@@ -471,6 +483,15 @@ function addChild(){const name=prompt(T().addChildPrompt,"");if(!name||!name.tri
   const id="k"+DB.profiles.length+Math.floor(performance.now());
   DB.profiles.push({id,name:name.trim(),color:PALETTE[DB.profiles.length%PALETTE.length],minimal:false,stryga:true,logs:[],acts:{}});
   DB.current=id;save();render();}
+async function deleteProfile(pid){
+  if(DB.profiles.length<=1)return;
+  const p=DB.profiles.find(x=>x.id===pid);
+  if(!confirm(T().removeConfirm(p?p.name:"")))return;
+  DB.profiles=DB.profiles.filter(x=>x.id!==pid);
+  if(DB.current===pid)DB.current=DB.profiles[0].id;
+  localStorage.setItem(LS_KEY,JSON.stringify(DB));
+  if(API){try{await fetch(`${API}/f/${DB.familyId}/p/${pid}`,{method:"DELETE"});}catch(e){}}
+  $("memBg").classList.remove("show");render();}
 function renderWorld(p){
   const stage=$("stage");[...stage.querySelectorAll(".zone")].forEach(z=>z.remove());
   let sum=0,sleepy=0;
@@ -641,6 +662,7 @@ function openMem(){
       const src=l.photo.startsWith("cloud:")?`${API}/f/${DB.familyId}/photo/${l.photo.slice(6)}`:l.photo;
       d.innerHTML=`<button class="del">${T().del}</button><img src="${src}"/><div class="cap">${cap}</div>`;
       d.querySelector(".del").onclick=()=>{p.logs[i].photo=null;save();openMem();};g.appendChild(d);});}
+  const rm=$("jrnRemove");rm.textContent=T().removeChild;rm.style.display=DB.profiles.length>1?"block":"none";rm.onclick=()=>deleteProfile(p.id);
   $("memBg").classList.add("show");
 }
 
@@ -662,7 +684,14 @@ $("minBtn").onclick=()=>{const p=cur();p.minimal=!p.minimal;save();render();};
 $("strygaBtn").onclick=()=>{const p=cur();p.stryga=(p.stryga===false);save();render();};
 $("printBtn").onclick=()=>window.print();
 $("memBtn").onclick=openMem;
-$("familyBtn").onclick=()=>{const c=DB.familyId;const v=prompt(T().familyMsg,c);if(v&&v.trim()&&v.trim()!==c){DB.familyId=v.trim();save();syncPull();}};
+$("familyBtn").onclick=async()=>{
+  const link=`${location.origin}${location.pathname}?family=${DB.familyId}`;
+  try{await navigator.clipboard.writeText(link);}catch(e){}
+  const v=prompt(T().familyMsg,link);if(!v)return;
+  const m=v.match(/[?&]family=([^&\s]+)/);
+  const code=(m?decodeURIComponent(m[1]):v).trim().replace(/\s/g,"");
+  if(code&&code.length>=12&&code!==DB.familyId){DB.familyId=code;save();syncPull();}
+};
 $("sheetClose").onclick=closeSheet;$("memClose").onclick=()=>$("memBg").classList.remove("show");
 ["sheetBg","memBg"].forEach(id=>$(id).onclick=e=>{if(e.target===$(id))$(id).classList.remove("show");});
 
