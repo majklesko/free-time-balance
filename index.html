@@ -159,6 +159,7 @@
   #pManage .av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;color:#fff}
   #pManage .pm-n{flex:1;font-weight:600}
   .pm-del{border:none;background:#fbeaea;color:#b4566a;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px}
+  .pm-lock{border:none;background:#eef3fb;color:#456;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px;margin-right:6px}
   .pm-add,.pm-pin{margin-top:10px;width:100%;border:1px solid #e6e8ee;background:#fafbfc;border-radius:12px;padding:10px;font:inherit;cursor:pointer}
   .pm-pin{margin-top:8px;color:#5d6677}
 
@@ -189,6 +190,7 @@
     <button class="chip" id="familyBtn">👪 <span id="familyLbl">Family</span></button>
     <button class="chip" id="strygaBtn">🧙‍♀️ <span id="strygaLbl">Visitor</span></button>
     <button class="chip" id="minBtn">📋 <span id="minLbl">Simple</span></button>
+    <button class="chip" id="installBtn" style="display:none">⬇️ <span id="installLbl">Install</span></button>
     <button class="chip" id="langBtn">SK</button>
     <button class="chip" id="printBtn">🖨️ <span id="printLbl">Print</span></button>
     <button class="chip" id="modeBtn">👋 <span id="modeLbl">Parent</span></button>
@@ -297,6 +299,16 @@
   <button class="close" id="sheetClose"></button>
 </div></div>
 
+<div class="ov" id="famBg"><div class="sheet">
+  <h3 id="famTitle"></h3><div class="sub" id="famSub"></div>
+  <div id="famLink" style="word-break:break-all;background:#f4f6f9;border-radius:10px;padding:10px;font-size:13px;margin-bottom:12px"></div>
+  <button class="pm-add" id="famShare" style="margin-top:0"></button>
+  <div class="lblmini" id="famJoinLbl" style="margin-top:16px"></div>
+  <input id="famJoinInput" placeholder="habitat-… / https://…" style="width:100%;border:1px solid #e6e8ee;border-radius:12px;padding:10px;font:inherit" />
+  <button class="pm-add" id="famJoinBtn"></button>
+  <button class="close" id="famClose"></button>
+</div></div>
+
 <div class="ov" id="memBg"><div class="sheet">
   <h3 id="memTitle"></h3><div class="sub" id="memSub"></div>
   <div id="jrnLevel"></div>
@@ -318,7 +330,8 @@
 const I18N={
  en:{brand:"Habitat",print:"Print",parent:"Parent",child:"Kids",simple:"Simple",world:"World",myweek:"My week",today:"today",
   hello:n=>`Hi ${n} 👋 — this is your world today`,addChild:"＋ Add child",addChildPrompt:"Child's name:",
-  family:"Family",familyMsg:"Link copied ✓ — share it in WhatsApp so your family joins this same world. To switch to another family, paste its link or code here:",
+  family:"Family",familyMsg:"Link copied ✓",install:"Install",iosInstall:"On iPhone: tap Share ⬆️ in Safari's bottom bar, then 'Add to Home Screen'.",
+  famTitle:"Your family",famSub:"Share this link so your family's phones see the same worlds.",famShareBtn:"📤 Share link",famCopied:"Link copied ✓",famJoinLbl:"Join another family (paste its link or code):",famJoinBtn:"Join",
   cat_home:"Helping at home",cat_space:"My space",cat_family:"Family",cat_friends:"Friends",cat_learn:"Learning",cat_self:"Time for me",cat_sport:"Moving",
   st_vibrant:"thriving",st_ok:"awake",st_sleepy:"sleeping…",
   worldGreat:"Your world is glowing 🌞",worldGood:"Your world looks happy 🙂",worldMixed:"A corner is getting sleepy 🌙",worldQuiet:"Your world is quiet — wake a corner when you like 🌙",
@@ -331,6 +344,7 @@ const I18N={
   memTitle:"My week",memSub:"Your moments and how your world has grown — only yours.",worldStory:"How your world has grown",memEmpty:"No photos yet. Add one when you log something 🌱",del:"×",
   journey:"Journey",jSub:"Your story — your level, what you've built, and space to reflect. Only yours.",jLevel:"Level",jDays:"balanced days",jSummer:"This summer so far",jDaysShort:"days",jReflect:"My reflection",jNotePh:"Write a reflection — how's it going? any ideas?",jPhotos:"My photos",removeChild:"🗑 Remove this child",removeConfirm:n=>`Remove ${n}? This deletes their world on all devices.`,
   manageKids:"Manage children",pinPrompt:"Parent PIN:",pinWrong:"Wrong PIN",pinSet:"🔒 Set a parent PIN",pinChange:"🔒 Change / remove PIN",pinSetPrompt:"Set a parent PIN (leave empty to remove it):",pinSaved:"Parent PIN set.",pinCleared:"Parent PIN removed.",
+  lockNote:"📱 = lock THIS device to one child, so siblings can't open each other's world. Set a PIN to make it stick.",lockedMsg:n=>`This device now shows only ${n}. Come back here (Parent) to change it.`,unlockedMsg:"Device unlocked — all children visible.",
   pTitle:"Family view",pLead:"You see how the family is doing — not what each child did. By design.",
   sigGood:"The family's world looks healthy",sigGoodSub:"Everyone has a few corners awake. Nothing to do.",sigQuiet:"One area is a little quiet across the family",sigQuietSub:"No action needed — it usually wakes up on its own.",
   ydTitle:"🎉 This has been a lovely balanced stretch.",ydBody:"Maybe a moment for a surprise Yes Day together? (Not earned, not owed — just a celebration.)",
@@ -340,7 +354,8 @@ const I18N={
   activities:{home:["Took out the trash","Emptied the dishwasher","Helped cook","Tidied a shared space"],space:["Tidied my room","Made my bed","Sorted my desk","Vacuumed my space"],family:["Played with my sibling","Helped a family member","Hung out with family","Did something kind at home"],friends:["Met a friend","Called / messaged a friend","Did something fun together","Made a new friend"],learn:["Learned something new","Read","Practiced a skill","Made/built something"],self:["I made time for myself","Did something just for me","Relaxed & recharged"],sport:["Went outside & moved","Played a sport","Walked / biked","Trained"]}},
  sk:{brand:"Habitat",print:"Tlač",parent:"Rodič",child:"Deti",simple:"Jednoducho",world:"Svet",myweek:"Môj týždeň",today:"dnes",
   hello:n=>`Ahoj ${n} 👋 — toto je dnes tvoj svet`,addChild:"＋ Pridaj dieťa",addChildPrompt:"Meno dieťaťa:",
-  family:"Rodina",familyMsg:"Link skopírovaný ✓ — pošli ho vo WhatsApp, nech sa rodina pripojí k tomu istému svetu. Ak chceš prejsť k inej rodine, vlož jej link alebo kód sem:",
+  family:"Rodina",familyMsg:"Link skopírovaný ✓",install:"Inštalovať",iosInstall:"Na iPhone: klikni Zdieľať ⬆️ v spodnej lište Safari a potom 'Pridať na plochu'.",
+  famTitle:"Vaša rodina",famSub:"Pošli tento link, nech telefóny rodiny vidia tie isté svety.",famShareBtn:"📤 Zdieľať link",famCopied:"Link skopírovaný ✓",famJoinLbl:"Pripojiť sa k inej rodine (vlož link alebo kód):",famJoinBtn:"Pripojiť",
   cat_home:"Pomoc doma",cat_space:"Môj priestor",cat_family:"Rodina",cat_friends:"Kamoši",cat_learn:"Učenie",cat_self:"Čas pre mňa",cat_sport:"Pohyb",
   st_vibrant:"prekvitá",st_ok:"bdie",st_sleepy:"spí…",
   worldGreat:"Tvoj svet žiari 🌞",worldGood:"Tvoj svet vyzerá spokojne 🙂",worldMixed:"Jeden kútik zaspáva 🌙",worldQuiet:"Tvoj svet je tichý — zobuď kútik, keď chceš 🌙",
@@ -353,6 +368,7 @@ const I18N={
   memTitle:"Môj týždeň",memSub:"Tvoje momenty a ako rástol tvoj svet — len tvoje.",worldStory:"Ako rástol tvoj svet",memEmpty:"Zatiaľ žiadne fotky. Pridaj, keď niečo zaznamenáš 🌱",del:"×",
   journey:"Cesta",jSub:"Tvoj príbeh — tvoja úroveň, čo si postavil a priestor na reflexiu. Len tvoje.",jLevel:"Úroveň",jDays:"vyvážených dní",jSummer:"Toto leto zatiaľ",jDaysShort:"dní",jReflect:"Moja reflexia",jNotePh:"Napíš reflexiu — ako to ide? nejaké nápady?",jPhotos:"Moje fotky",removeChild:"🗑 Odstrániť dieťa",removeConfirm:n=>`Odstrániť ${n}? Vymaže to jeho svet na všetkých zariadeniach.`,
   manageKids:"Správa detí",pinPrompt:"Rodičovský PIN:",pinWrong:"Nesprávny PIN",pinSet:"🔒 Nastaviť rodičovský PIN",pinChange:"🔒 Zmeniť / zrušiť PIN",pinSetPrompt:"Nastav rodičovský PIN (prázdne = zrušiť):",pinSaved:"PIN nastavený.",pinCleared:"PIN zrušený.",
+  lockNote:"📱 = uzamkni TOTO zariadenie na jedno dieťa, aby si súrodenci nevedeli otvoriť cudzí svet. Nastav PIN, nech to drží.",lockedMsg:n=>`Toto zariadenie teraz ukazuje len: ${n}. Zmeníš to tu (Rodič).`,unlockedMsg:"Zariadenie odomknuté — všetky deti viditeľné.",
   pTitle:"Pohľad rodiny",pLead:"Vidíš, ako sa darí rodine — nie čo ktoré dieťa robilo. Zámerne.",
   sigGood:"Svet rodiny vyzerá zdravo",sigGoodSub:"Každý má pár kútikov bdelých. Netreba nič.",sigQuiet:"Jedna oblasť je v rodine trochu tichá",sigQuietSub:"Netreba zasahovať — zvyčajne sa zobudí sama.",
   ydTitle:"🎉 Toto bolo pekné vyvážené obdobie.",ydBody:"Možno chvíľa na prekvapivý spoločný Yes Day? (Nie zaslúžený, nie dlžný — len oslava.)",
@@ -471,12 +487,14 @@ function render(){
   LANG=DB.lang;
   $("brand").textContent=T().brand;$("printLbl").textContent=T().print;
   $("langBtn").textContent=LANG==="en"?"SK":"EN";$("modeLbl").textContent=MODE==="child"?T().parent:T().child;
-  $("memLbl").textContent=T().journey;$("familyLbl").textContent=T().family;$("footnote").textContent=T().footnote;
+  $("memLbl").textContent=T().journey;$("familyLbl").textContent=T().family;$("installLbl").textContent=T().install;$("footnote").textContent=T().footnote;
   $("ph-title").textContent=T().ph_title;$("ph-sub").textContent=T().ph_sub;
   if(MODE==="parent"){$("childView").style.display="none";$("parentView").style.display="block";
     $("profiles").style.display="none";$("memBtn").style.display="none";$("minBtn").style.display="none";$("strygaBtn").style.display="none";$("who").textContent="";renderParent();return;}
-  $("childView").style.display="block";$("parentView").style.display="none";$("profiles").style.display="flex";$("memBtn").style.display="";$("minBtn").style.display="";$("strygaBtn").style.display="";
-  renderProfiles();const p=cur();
+  $("childView").style.display="block";$("parentView").style.display="none";$("memBtn").style.display="";$("minBtn").style.display="";$("strygaBtn").style.display="";
+  if(DB.lockedTo&&DB.profiles.find(x=>x.id===DB.lockedTo)){DB.current=DB.lockedTo;$("profiles").style.display="none";}
+  else{DB.lockedTo=null;$("profiles").style.display="flex";renderProfiles();}
+  const p=cur();
   $("who").textContent=T().hello(p.name);
   $("minBtn").classList.toggle("on",!!p.minimal);$("minLbl").textContent=p.minimal?T().world:T().simple;
   $("strygaBtn").classList.toggle("on",p.stryga!==false);$("strygaLbl").textContent=T().visitor;
@@ -686,8 +704,11 @@ function renderParent(){
   // child management (parent-only area)
   const mg=$("pManage");mg.innerHTML="";
   const h=document.createElement("div");h.className="jhead";h.textContent=T().manageKids;mg.appendChild(h);
+  const note=document.createElement("div");note.style.cssText="font-size:12px;color:var(--muted);margin-bottom:8px";note.textContent=T().lockNote;mg.appendChild(note);
   DB.profiles.forEach(p=>{const row=document.createElement("div");row.className="pm-row";
     row.innerHTML=`<span class="av" style="background:${p.color}">${p.name[0]}</span><span class="pm-n">${p.name}</span>`;
+    const lk=document.createElement("button");lk.className="pm-lock";lk.textContent=DB.lockedTo===p.id?"📱 ✓":"📱";
+    lk.onclick=()=>{DB.lockedTo=(DB.lockedTo===p.id?null:p.id);localStorage.setItem(LS_KEY,JSON.stringify(DB));render();alert(DB.lockedTo?T().lockedMsg(p.name):T().unlockedMsg);};row.appendChild(lk);
     if(DB.profiles.length>1){const del=document.createElement("button");del.className="pm-del";del.textContent="🗑";del.onclick=()=>deleteProfile(p.id);row.appendChild(del);}
     mg.appendChild(row);});
   const add=document.createElement("button");add.className="pm-add";add.textContent=T().addChild;add.onclick=addChild;mg.appendChild(add);
@@ -705,16 +726,21 @@ $("minBtn").onclick=()=>{const p=cur();p.minimal=!p.minimal;save();render();};
 $("strygaBtn").onclick=()=>{const p=cur();p.stryga=(p.stryga===false);save();render();};
 $("printBtn").onclick=()=>window.print();
 $("memBtn").onclick=openMem;
-$("familyBtn").onclick=async()=>{
-  const link=`${location.origin}${location.pathname}?family=${DB.familyId}`;
-  try{await navigator.clipboard.writeText(link);}catch(e){}
-  const v=prompt(T().familyMsg,link);if(!v)return;
-  const m=v.match(/[?&]family=([^&\s]+)/);
-  const code=(m?decodeURIComponent(m[1]):v).trim().replace(/\s/g,"");
-  if(code&&code.length>=12&&code!==DB.familyId){DB.familyId=code;save();syncPull();}
+function famLink(){return `${location.origin}${location.pathname}?family=${DB.familyId}`;}
+$("familyBtn").onclick=()=>{
+  $("famTitle").textContent=T().famTitle;$("famSub").textContent=T().famSub;$("famLink").textContent=famLink();
+  $("famShare").textContent=T().famShareBtn;$("famJoinLbl").textContent=T().famJoinLbl;$("famJoinBtn").textContent=T().famJoinBtn;
+  $("famClose").textContent=T().close;$("famJoinInput").value="";$("famBg").classList.add("show");
 };
+$("famShare").onclick=async()=>{const link=famLink();
+  if(navigator.share){try{await navigator.share({title:"Habitat 🌍",url:link});return;}catch(e){}}
+  try{await navigator.clipboard.writeText(link);toast(T().famCopied);}catch(e){prompt(T().famShareBtn,link);}};
+$("famJoinBtn").onclick=()=>{const v=$("famJoinInput").value||"";const m=v.match(/[?&]family=([^&\s]+)/);
+  const code=(m?decodeURIComponent(m[1]):v).trim().replace(/\s/g,"");
+  if(code&&code.length>=12&&code!==DB.familyId){DB.familyId=code;save();$("famBg").classList.remove("show");syncPull();}};
+$("famClose").onclick=()=>$("famBg").classList.remove("show");
 $("sheetClose").onclick=closeSheet;$("memClose").onclick=()=>$("memBg").classList.remove("show");
-["sheetBg","memBg"].forEach(id=>$(id).onclick=e=>{if(e.target===$(id))$(id).classList.remove("show");});
+["sheetBg","memBg","famBg"].forEach(id=>$(id).onclick=e=>{if(e.target===$(id))$(id).classList.remove("show");});
 
 /* demo seed — 10 varied balanced days (no same trio two days running) + partial today */
 if(!DB._seeded){
@@ -730,6 +756,12 @@ if(!DB._seeded){
 }
 render();ensureScenery();syncPull();
 if("serviceWorker" in navigator){try{navigator.serviceWorker.register("sw.js");}catch(e){}}
+// in-app install button (Chrome/Android via beforeinstallprompt; iOS shows instructions)
+let deferredPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("installBtn").style.display="";});
+window.addEventListener("appinstalled",()=>{$("installBtn").style.display="none";});
+{const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent);const standalone=(window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches)||navigator.standalone;if(isIOS&&!standalone)$("installBtn").style.display="";}
+$("installBtn").onclick=async()=>{if(deferredPrompt){deferredPrompt.prompt();try{await deferredPrompt.userChoice;}catch(e){}deferredPrompt=null;$("installBtn").style.display="none";}else alert(T().iosInstall);};
 </script>
 </body>
 </html>
