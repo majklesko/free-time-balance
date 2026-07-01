@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#cfe9ff" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-title" content="Habitat" />
-<link rel="apple-touch-icon" href="icon.svg" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <link rel="icon" href="icon.svg" />
 <!--
   Free Time Balance — clickable prototype v3 (working name placeholder). Spec FTB-20260628-001.
@@ -155,6 +155,12 @@
   .sum-row .su-i{font-size:17px}.sum-row .su-n{flex:1}.sum-row .su-d{color:var(--muted)}
   #jrnNote{width:100%;min-height:64px;border:1px solid #e6e8ee;border-radius:12px;padding:10px;font:inherit;font-size:14px;margin-top:4px;resize:vertical}
   .jremove{margin-top:14px;width:100%;background:transparent;border:1px solid #f0d2d2;color:#b4566a;border-radius:12px;padding:9px;font:inherit;font-size:13px;cursor:pointer}
+  #pManage .pm-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed #eef0f4}
+  #pManage .av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;color:#fff}
+  #pManage .pm-n{flex:1;font-weight:600}
+  .pm-del{border:none;background:#fbeaea;color:#b4566a;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:14px}
+  .pm-add,.pm-pin{margin-top:10px;width:100%;border:1px solid #e6e8ee;background:#fafbfc;border-radius:12px;padding:10px;font:inherit;cursor:pointer}
+  .pm-pin{margin-top:8px;color:#5d6677}
 
   .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);opacity:0;background:#222838;color:#fff;padding:12px 18px;border-radius:999px;font-size:14px;z-index:40;transition:.35s;pointer-events:none}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
@@ -276,6 +282,7 @@
       <div class="signal"><div class="big" id="pBig">🌤️</div><div class="s-txt"><strong id="pStrong"></strong><span id="pSpan"></span></div></div>
       <div class="yesday" id="yesday"><b id="ydTitle"></b><div id="ydBody" style="font-size:14px;margin-top:6px"></div></div>
       <div class="firewall" id="firewall"></div>
+      <div id="pManage"></div>
     </div>
   </section>
 
@@ -323,6 +330,7 @@ const I18N={
   nudgeTxt:c=>`${c} has gone a little quiet. Want a tiny idea to wake it up? (optional)`,nudgeLater:"Not now",nudgeOk:"Show me",
   memTitle:"My week",memSub:"Your moments and how your world has grown — only yours.",worldStory:"How your world has grown",memEmpty:"No photos yet. Add one when you log something 🌱",del:"×",
   journey:"Journey",jSub:"Your story — your level, what you've built, and space to reflect. Only yours.",jLevel:"Level",jDays:"balanced days",jSummer:"This summer so far",jDaysShort:"days",jReflect:"My reflection",jNotePh:"Write a reflection — how's it going? any ideas?",jPhotos:"My photos",removeChild:"🗑 Remove this child",removeConfirm:n=>`Remove ${n}? This deletes their world on all devices.`,
+  manageKids:"Manage children",pinPrompt:"Parent PIN:",pinWrong:"Wrong PIN",pinSet:"🔒 Set a parent PIN",pinChange:"🔒 Change / remove PIN",pinSetPrompt:"Set a parent PIN (leave empty to remove it):",pinSaved:"Parent PIN set.",pinCleared:"Parent PIN removed.",
   pTitle:"Family view",pLead:"You see how the family is doing — not what each child did. By design.",
   sigGood:"The family's world looks healthy",sigGoodSub:"Everyone has a few corners awake. Nothing to do.",sigQuiet:"One area is a little quiet across the family",sigQuietSub:"No action needed — it usually wakes up on its own.",
   ydTitle:"🎉 This has been a lovely balanced stretch.",ydBody:"Maybe a moment for a surprise Yes Day together? (Not earned, not owed — just a celebration.)",
@@ -344,6 +352,7 @@ const I18N={
   nudgeTxt:c=>`„${c}" trochu stíchlo. Chceš drobný nápad, ako to zobudiť? (nepovinné)`,nudgeLater:"Teraz nie",nudgeOk:"Ukáž",
   memTitle:"Môj týždeň",memSub:"Tvoje momenty a ako rástol tvoj svet — len tvoje.",worldStory:"Ako rástol tvoj svet",memEmpty:"Zatiaľ žiadne fotky. Pridaj, keď niečo zaznamenáš 🌱",del:"×",
   journey:"Cesta",jSub:"Tvoj príbeh — tvoja úroveň, čo si postavil a priestor na reflexiu. Len tvoje.",jLevel:"Úroveň",jDays:"vyvážených dní",jSummer:"Toto leto zatiaľ",jDaysShort:"dní",jReflect:"Moja reflexia",jNotePh:"Napíš reflexiu — ako to ide? nejaké nápady?",jPhotos:"Moje fotky",removeChild:"🗑 Odstrániť dieťa",removeConfirm:n=>`Odstrániť ${n}? Vymaže to jeho svet na všetkých zariadeniach.`,
+  manageKids:"Správa detí",pinPrompt:"Rodičovský PIN:",pinWrong:"Nesprávny PIN",pinSet:"🔒 Nastaviť rodičovský PIN",pinChange:"🔒 Zmeniť / zrušiť PIN",pinSetPrompt:"Nastav rodičovský PIN (prázdne = zrušiť):",pinSaved:"PIN nastavený.",pinCleared:"PIN zrušený.",
   pTitle:"Pohľad rodiny",pLead:"Vidíš, ako sa darí rodine — nie čo ktoré dieťa robilo. Zámerne.",
   sigGood:"Svet rodiny vyzerá zdravo",sigGoodSub:"Každý má pár kútikov bdelých. Netreba nič.",sigQuiet:"Jedna oblasť je v rodine trochu tichá",sigQuietSub:"Netreba zasahovať — zvyčajne sa zobudí sama.",
   ydTitle:"🎉 Toto bolo pekné vyvážené obdobie.",ydBody:"Možno chvíľa na prekvapivý spoločný Yes Day? (Nie zaslúžený, nie dlžný — len oslava.)",
@@ -477,8 +486,7 @@ function render(){
 }
 function renderProfiles(){const b=$("profiles");b.innerHTML="";DB.profiles.forEach(p=>{const e=document.createElement("button");
   e.className="pfile"+(p.id===DB.current?" active":"");e.innerHTML=`<span class="av" style="background:${p.color}">${p.name[0]}</span>${p.name}`;
-  e.onclick=()=>{DB.current=p.id;save();render();};b.appendChild(e);});
-  const addb=document.createElement("button");addb.className="pfile";addb.style.color="#5d6677";addb.textContent=T().addChild;addb.onclick=addChild;b.appendChild(addb);}
+  e.onclick=()=>{DB.current=p.id;save();render();};b.appendChild(e);});}
 function addChild(){const name=prompt(T().addChildPrompt,"");if(!name||!name.trim())return;
   const id="k"+DB.profiles.length+Math.floor(performance.now());
   DB.profiles.push({id,name:name.trim(),color:PALETTE[DB.profiles.length%PALETTE.length],minimal:false,stryga:true,logs:[],acts:{}});
@@ -662,7 +670,7 @@ function openMem(){
       const src=l.photo.startsWith("cloud:")?`${API}/f/${DB.familyId}/photo/${l.photo.slice(6)}`:l.photo;
       d.innerHTML=`<button class="del">${T().del}</button><img src="${src}"/><div class="cap">${cap}</div>`;
       d.querySelector(".del").onclick=()=>{p.logs[i].photo=null;save();openMem();};g.appendChild(d);});}
-  const rm=$("jrnRemove");rm.textContent=T().removeChild;rm.style.display=DB.profiles.length>1?"block":"none";rm.onclick=()=>deleteProfile(p.id);
+  $("jrnRemove").style.display="none"; // profile management moved to Parent view
   $("memBg").classList.add("show");
 }
 
@@ -675,11 +683,24 @@ function renderParent(){
   const allBalanced=DB.profiles.every(p=>{const awake=CATS.filter(c=>stOf(vit(p,c.key))!=="sleepy").length;
     const days=new Set(p.logs.filter(l=>ageOf(l.date)<WINDOW_DAYS).map(l=>l.date)).size;return awake>=5&&days>=5;});
   const yd=$("yesday");if(allBalanced){yd.classList.add("show");$("ydTitle").textContent=T().ydTitle;$("ydBody").textContent=T().ydBody;}else yd.classList.remove("show");
+  // child management (parent-only area)
+  const mg=$("pManage");mg.innerHTML="";
+  const h=document.createElement("div");h.className="jhead";h.textContent=T().manageKids;mg.appendChild(h);
+  DB.profiles.forEach(p=>{const row=document.createElement("div");row.className="pm-row";
+    row.innerHTML=`<span class="av" style="background:${p.color}">${p.name[0]}</span><span class="pm-n">${p.name}</span>`;
+    if(DB.profiles.length>1){const del=document.createElement("button");del.className="pm-del";del.textContent="🗑";del.onclick=()=>deleteProfile(p.id);row.appendChild(del);}
+    mg.appendChild(row);});
+  const add=document.createElement("button");add.className="pm-add";add.textContent=T().addChild;add.onclick=addChild;mg.appendChild(add);
+  const pinb=document.createElement("button");pinb.className="pm-pin";pinb.textContent=DB.pin?T().pinChange:T().pinSet;pinb.onclick=setPin;mg.appendChild(pinb);
 }
 
 /* ===================== wiring ===================== */
 $("langBtn").onclick=()=>{DB.lang=DB.lang==="en"?"sk":"en";save();render();};
-$("modeBtn").onclick=()=>{MODE=MODE==="child"?"parent":"child";render();};
+$("modeBtn").onclick=()=>{
+  if(MODE==="child"){ if(DB.pin){const v=prompt(T().pinPrompt,"");if(v!==DB.pin){if(v!==null)alert(T().pinWrong);return;}} MODE="parent"; }
+  else MODE="child";
+  render();};
+function setPin(){const v=prompt(T().pinSetPrompt,DB.pin||"");if(v===null)return;DB.pin=v.trim()||null;save();alert(DB.pin?T().pinSaved:T().pinCleared);}
 $("minBtn").onclick=()=>{const p=cur();p.minimal=!p.minimal;save();render();};
 $("strygaBtn").onclick=()=>{const p=cur();p.stryga=(p.stryga===false);save();render();};
 $("printBtn").onclick=()=>window.print();
@@ -708,6 +729,7 @@ if(!DB._seeded){
   DB._seeded=true;save();
 }
 render();ensureScenery();syncPull();
+if("serviceWorker" in navigator){try{navigator.serviceWorker.register("sw.js");}catch(e){}}
 </script>
 </body>
 </html>
