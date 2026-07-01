@@ -173,6 +173,7 @@
     <div class="brand">🌍 <span id="brand">your world</span><span class="dot">.</span></div>
     <div class="spacer"></div>
     <button class="chip" id="memBtn">🖼️ <span id="memLbl">My week</span></button>
+    <button class="chip" id="familyBtn">👪 <span id="familyLbl">Family</span></button>
     <button class="chip" id="strygaBtn">🧙‍♀️ <span id="strygaLbl">Visitor</span></button>
     <button class="chip" id="minBtn">📋 <span id="minLbl">Simple</span></button>
     <button class="chip" id="langBtn">SK</button>
@@ -302,6 +303,7 @@
 const I18N={
  en:{brand:"Habitat",print:"Print",parent:"Parent",child:"Kids",simple:"Simple",world:"World",myweek:"My week",today:"today",
   hello:n=>`Hi ${n} 👋 — this is your world today`,addChild:"＋ Add child",addChildPrompt:"Child's name:",
+  family:"Family",familyMsg:"Your family code — share it with your family's OTHER devices so they see the same worlds. To join another family, paste its code here:",
   cat_home:"Helping at home",cat_space:"My space",cat_family:"Family",cat_friends:"Friends",cat_learn:"Learning",cat_self:"Time for me",cat_sport:"Moving",
   st_vibrant:"thriving",st_ok:"awake",st_sleepy:"sleeping…",
   worldGreat:"Your world is glowing 🌞",worldGood:"Your world looks happy 🙂",worldMixed:"A corner is getting sleepy 🌙",worldQuiet:"Your world is quiet — wake a corner when you like 🌙",
@@ -322,6 +324,7 @@ const I18N={
   activities:{home:["Took out the trash","Emptied the dishwasher","Helped cook","Tidied a shared space"],space:["Tidied my room","Made my bed","Sorted my desk","Vacuumed my space"],family:["Played with my sibling","Helped a family member","Hung out with family","Did something kind at home"],friends:["Met a friend","Called / messaged a friend","Did something fun together","Made a new friend"],learn:["Learned something new","Read","Practiced a skill","Made/built something"],self:["I made time for myself","Did something just for me","Relaxed & recharged"],sport:["Went outside & moved","Played a sport","Walked / biked","Trained"]}},
  sk:{brand:"Habitat",print:"Tlač",parent:"Rodič",child:"Deti",simple:"Jednoducho",world:"Svet",myweek:"Môj týždeň",today:"dnes",
   hello:n=>`Ahoj ${n} 👋 — toto je dnes tvoj svet`,addChild:"＋ Pridaj dieťa",addChildPrompt:"Meno dieťaťa:",
+  family:"Rodina",familyMsg:"Kód rodiny — pošli ho na OSTATNÉ zariadenia rodiny, nech vidia tie isté svety. Ak sa chceš pripojiť k inej rodine, vlož jej kód sem:",
   cat_home:"Pomoc doma",cat_space:"Môj priestor",cat_family:"Rodina",cat_friends:"Kamoši",cat_learn:"Učenie",cat_self:"Čas pre mňa",cat_sport:"Pohyb",
   st_vibrant:"prekvitá",st_ok:"bdie",st_sleepy:"spí…",
   worldGreat:"Tvoj svet žiari 🌞",worldGood:"Tvoj svet vyzerá spokojne 🙂",worldMixed:"Jeden kútik zaspáva 🌙",worldQuiet:"Tvoj svet je tichý — zobuď kútik, keď chceš 🌙",
@@ -381,7 +384,18 @@ let DB=load()||{lang:"en",current:null,nudgeDismissed:{},profiles:[
  {id:"mia",name:"Mia",color:"#9cd6a4",minimal:false,stryga:false,age:6,logs:[],acts:{family:["Played with family"],self:["Played"],learn:["Learned a song"],sport:["Ran around outside"]}}
 ]};
 if(!DB.current)DB.current=DB.profiles[0].id;
-const save=()=>localStorage.setItem(LS_KEY,JSON.stringify(DB));
+// ---- Cloudflare sync (Worker + KV) ----
+const API="https://habitat.michal-4ea.workers.dev";
+if(!DB.familyId)DB.familyId="fam-"+Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,8);
+let pushTimer=null;
+const save=()=>{localStorage.setItem(LS_KEY,JSON.stringify(DB));
+  if(API){clearTimeout(pushTimer);pushTimer=setTimeout(()=>syncPush(cur()),800);}};
+async function syncPush(p){if(!API||!p)return;try{await fetch(`${API}/f/${DB.familyId}/p/${p.id}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(p)});}catch(e){}}
+async function syncPull(){if(!API)return;try{const r=await fetch(`${API}/f/${DB.familyId}`);if(!r.ok)return;const d=await r.json();
+  if(d.profiles&&d.profiles.length){const byId={};DB.profiles.forEach(p=>byId[p.id]=p);d.profiles.forEach(p=>byId[p.id]=p);
+    DB.profiles=Object.values(byId);if(!DB.profiles.find(p=>p.id===DB.current))DB.current=DB.profiles[0].id;
+    localStorage.setItem(LS_KEY,JSON.stringify(DB));render();}
+  else{DB.profiles.forEach(syncPush);}}catch(e){}}
 let MODE="child",LANG=DB.lang;
 const T=()=>I18N[LANG], $=id=>document.getElementById(id), cur=()=>DB.profiles.find(p=>p.id===DB.current);
 const today=()=>new Date().toISOString().slice(0,10);
@@ -436,7 +450,7 @@ function render(){
   LANG=DB.lang;
   $("brand").textContent=T().brand;$("printLbl").textContent=T().print;
   $("langBtn").textContent=LANG==="en"?"SK":"EN";$("modeLbl").textContent=MODE==="child"?T().parent:T().child;
-  $("memLbl").textContent=T().journey;$("footnote").textContent=T().footnote;
+  $("memLbl").textContent=T().journey;$("familyLbl").textContent=T().family;$("footnote").textContent=T().footnote;
   $("ph-title").textContent=T().ph_title;$("ph-sub").textContent=T().ph_sub;
   if(MODE==="parent"){$("childView").style.display="none";$("parentView").style.display="block";
     $("profiles").style.display="none";$("memBtn").style.display="none";$("minBtn").style.display="none";$("strygaBtn").style.display="none";$("who").textContent="";renderParent();return;}
@@ -580,9 +594,11 @@ function openSheet(c){
 }
 const closeSheet=()=>$("sheetBg").classList.remove("show");
 $("photoInput").onchange=function(){const f=this.files&&this.files[0];if(!f)return;const img=new Image();const rd=new FileReader();
-  rd.onload=e=>{img.onload=()=>{const max=640,sc=Math.min(1,max/Math.max(img.width,img.height));const cv=document.createElement("canvas");
+  rd.onload=e=>{img.onload=async()=>{const max=640,sc=Math.min(1,max/Math.max(img.width,img.height));const cv=document.createElement("canvas");
     cv.width=Math.round(img.width*sc);cv.height=Math.round(img.height*sc);cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);
-    pendPhoto=cv.toDataURL("image/jpeg",0.75);const pc=$("photoChip");if(pc){pc.textContent=T().photoOn;pc.classList.add("sel");}};img.src=e.target.result;};rd.readAsDataURL(f);};
+    const dataUrl=cv.toDataURL("image/jpeg",0.75);
+    if(API){try{const r=await fetch(`${API}/f/${DB.familyId}/photo`,{method:"POST",headers:{"Content-Type":"text/plain"},body:dataUrl});const j=await r.json();pendPhoto="cloud:"+j.id;}catch(e){pendPhoto=dataUrl;}}else pendPhoto=dataUrl;
+    const pc=$("photoChip");if(pc){pc.textContent=T().photoOn;pc.classList.add("sel");}};img.src=e.target.result;};rd.readAsDataURL(f);};
 function doLog(c,label){
   const p=cur();const wasNeg=neglected(p,c.key);lastLogged=c.key;
   const entry={cat:c.key,date:today(),label};
@@ -622,7 +638,8 @@ function openMem(){
   else{ph.style.display="block";ph.textContent=T().jPhotos;
     photos.forEach(({l,i})=>{const d=document.createElement("div");d.className="mem";
       const cap=(l.cap||T()["cat_"+l.cat])+(l.amt?(" · "+l.amt):"");
-      d.innerHTML=`<button class="del">${T().del}</button><img src="${l.photo}"/><div class="cap">${cap}</div>`;
+      const src=l.photo.startsWith("cloud:")?`${API}/f/${DB.familyId}/photo/${l.photo.slice(6)}`:l.photo;
+      d.innerHTML=`<button class="del">${T().del}</button><img src="${src}"/><div class="cap">${cap}</div>`;
       d.querySelector(".del").onclick=()=>{p.logs[i].photo=null;save();openMem();};g.appendChild(d);});}
   $("memBg").classList.add("show");
 }
@@ -644,7 +661,9 @@ $("modeBtn").onclick=()=>{MODE=MODE==="child"?"parent":"child";render();};
 $("minBtn").onclick=()=>{const p=cur();p.minimal=!p.minimal;save();render();};
 $("strygaBtn").onclick=()=>{const p=cur();p.stryga=(p.stryga===false);save();render();};
 $("printBtn").onclick=()=>window.print();
-$("memBtn").onclick=openMem;$("sheetClose").onclick=closeSheet;$("memClose").onclick=()=>$("memBg").classList.remove("show");
+$("memBtn").onclick=openMem;
+$("familyBtn").onclick=()=>{const c=DB.familyId;const v=prompt(T().familyMsg,c);if(v&&v.trim()&&v.trim()!==c){DB.familyId=v.trim();save();syncPull();}};
+$("sheetClose").onclick=closeSheet;$("memClose").onclick=()=>$("memBg").classList.remove("show");
 ["sheetBg","memBg"].forEach(id=>$(id).onclick=e=>{if(e.target===$(id))$(id).classList.remove("show");});
 
 /* demo seed — 10 varied balanced days (no same trio two days running) + partial today */
@@ -659,7 +678,7 @@ if(!DB._seeded){
   Z.forEach((c,i)=>add("mia",i+1,c)); add("mia",0,["family"]); // 6yo: fewer, today 1/3
   DB._seeded=true;save();
 }
-render();ensureScenery();
+render();ensureScenery();syncPull();
 </script>
 </body>
 </html>
