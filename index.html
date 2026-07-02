@@ -93,6 +93,15 @@
   .zone.today .blob{box-shadow:inset 0 -8px 18px rgba(0,0,0,.06),0 0 0 3px rgba(246,166,35,.4),0 8px 18px rgba(0,0,0,.08)}
   .bloom{position:absolute;bottom:-3px;font-size:16px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.18));transform-origin:bottom center;animation:bloomin .5s ease both;z-index:3}
   @keyframes bloomin{0%{transform:scale(0) translateY(6px);opacity:0}70%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+  /* celebration when an activity is logged */
+  .confetti{position:absolute;width:9px;height:9px;border-radius:2px;pointer-events:none;z-index:8;will-change:transform,opacity;animation:confetti-fly .9s ease-out forwards}
+  @keyframes confetti-fly{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--rot));opacity:0}}
+  .ripple{position:absolute;border-radius:50%;border:3px solid rgba(246,166,35,.6);pointer-events:none;z-index:7;animation:ripple-out .7s ease-out forwards}
+  @keyframes ripple-out{0%{width:20px;height:20px;opacity:.85}100%{width:190px;height:190px;opacity:0}}
+  .zone.justlogged{animation:zonepop .6s ease}
+  @keyframes zonepop{0%{transform:translate(-50%,-50%) scale(1)}30%{transform:translate(-50%,-50%) scale(1.2)}60%{transform:translate(-50%,-50%) scale(.97)}100%{transform:translate(-50%,-50%) scale(1)}}
+  .mrow.rowflash{animation:rowflash .7s ease}
+  @keyframes rowflash{0%{background:#fff2d6}100%{background:transparent}}
   .tbadge{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:#b06a00;background:#fff4e0;border-radius:99px;padding:2px 8px;margin-left:6px;vertical-align:middle}
   /* creatures */
   #buddy{position:absolute;width:84px;height:84px;left:50%;top:60%;transform:translate(-50%,-50%);transition:left 1.6s cubic-bezier(.5,.05,.3,1),top 1.6s cubic-bezier(.5,.05,.3,1);z-index:5;pointer-events:none}
@@ -538,7 +547,7 @@ function renderWorld(p){
   const stage=$("stage");[...stage.querySelectorAll(".zone")].forEach(z=>z.remove());
   let sum=0,sleepy=0;
   CATS.forEach(c=>{const v=vit(p,c.key);sum+=v;const st=stOf(v);if(st==="sleepy")sleepy++;
-    const z=document.createElement("div");z.className="zone "+st;z.style.left=c.x+"%";z.style.top=c.y+"%";
+    const z=document.createElement("div");z.className="zone "+st;z.dataset.cat=c.key;z.style.left=c.x+"%";z.style.top=c.y+"%";
     z.innerHTML=`<div class="blob" style="background:radial-gradient(120% 120% at 40% 30%,#fff,${st==="sleepy"?"#e9ecf2":c.color})"></div>
       ${st==="sleepy"?'<div class="zzz">z z</div>':''}<div class="ico">${c.ico}</div><div class="lbl">${T()["cat_"+c.key]}</div><div class="st">${T()["st_"+st]}</div>`;
     const tc=todayCount(p,c.key);
@@ -560,7 +569,7 @@ function renderList(p){
   CATS.forEach(c=>{const v=vit(p,c.key);sum+=v;const st=stOf(v);const tc=todayCount(p,c.key);
     const badge=tc>0?`<span class="tbadge">🌼 ${T().today}${tc>1?" ×"+tc:""}</span>`:"";
     const negm=neglected(p,c.key)?" 🧙‍♀️":"";
-    const row=document.createElement("div");row.className="mrow";
+    const row=document.createElement("div");row.className="mrow";row.dataset.cat=c.key;
     row.innerHTML=`<div class="mi">${c.ico}</div><div class="mn">${T()["cat_"+c.key]}${badge}${negm}</div>
       <div class="bar"><i style="width:${Math.round(v*100)}%;background:${st==="sleepy"?"#c4cbd6":c.color}"></i></div><div class="ms">${T()["st_"+st]}</div>`;
     row.onclick=()=>openSheet(c);m.appendChild(row);});
@@ -667,9 +676,22 @@ function doLog(c,label){
   const entry={cat:c.key,date:today(),label};
   if(pendAmt)entry.amt=pendAmt;if(pendPhoto)entry.photo=pendPhoto;
   p.logs.push(entry);if(wasNeg)clearedKey=c.key;save();closeSheet();render();
+  celebrate(c.key);try{if(navigator.vibrate)navigator.vibrate(15);}catch(e){}
   toast(wasNeg?T().strygaGone:T().logged);
 }
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1700);}
+function celebrate(catKey){
+  const p=cur();
+  if(p.minimal){const row=$("mlist").querySelector('.mrow[data-cat="'+catKey+'"]');if(row){row.classList.add("rowflash");setTimeout(()=>row.classList.remove("rowflash"),700);}return;}
+  const c=CATS.find(x=>x.key===catKey);const stage=$("stage");if(!c||!stage)return;
+  const rp=document.createElement("div");rp.className="ripple";rp.style.left=c.x+"%";rp.style.top=c.y+"%";rp.style.transform="translate(-50%,-50%)";stage.appendChild(rp);setTimeout(()=>rp.remove(),720);
+  const cols=["#ffd45e","#ff9db0","#8fd9f0","#86d6a0","#c9a0ff","#ffb4a2"];
+  for(let i=0;i<16;i++){const f=document.createElement("div");f.className="confetti";f.style.left=c.x+"%";f.style.top=c.y+"%";f.style.background=cols[i%cols.length];
+    const ang=(i/16)*6.28+Math.random(),dist=42+Math.random()*72;
+    f.style.setProperty("--dx",(Math.cos(ang)*dist).toFixed(0)+"px");f.style.setProperty("--dy",(Math.sin(ang)*dist-18).toFixed(0)+"px");f.style.setProperty("--rot",(Math.random()*560-280).toFixed(0)+"deg");
+    stage.appendChild(f);setTimeout(()=>f.remove(),950);}
+  const z=stage.querySelector('.zone[data-cat="'+catKey+'"]');if(z){z.classList.add("justlogged");setTimeout(()=>z.classList.remove("justlogged"),650);}
+}
 
 /* ===================== memories + world story (kid-only) ===================== */
 function openMem(target){
