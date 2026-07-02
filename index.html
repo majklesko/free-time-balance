@@ -165,6 +165,12 @@
   .sum-row{display:flex;align-items:center;gap:10px;font-size:13px;padding:5px 0;border-bottom:1px dashed #f0f1f4}
   .sum-row .su-i{font-size:17px}.sum-row .su-n{flex:1}.sum-row .su-d{color:var(--muted)}
   #jrnNote{width:100%;min-height:64px;border:1px solid #e6e8ee;border-radius:12px;padding:10px;font:inherit;font-size:14px;margin-top:4px;resize:vertical}
+  #jrnHow{background:#f0f8ef;border:1px solid #cfe6cc;border-radius:12px;padding:10px 12px;font-size:13px;color:#3a5a3a;margin:8px 0 4px;line-height:1.45}
+  .lad-row{display:flex;align-items:center;gap:9px;font-size:13px;padding:6px 2px;border-bottom:1px dashed #f0f1f4}
+  .lad-row.next{background:#fff7e0;border:1px solid #f6d79a;border-radius:10px;padding:8px 10px;font-weight:600}
+  .lad-row.future{opacity:.42}
+  .lad-row .lad-ic{width:22px;text-align:center}
+  .lad-row .lad-x{margin-left:auto;font-size:11px;color:#b06a00;font-weight:600}
   .jremove{margin-top:14px;width:100%;background:transparent;border:1px solid #f0d2d2;color:#b4566a;border-radius:12px;padding:9px;font:inherit;font-size:13px;cursor:pointer}
   #pManage .pm-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed #eef0f4}
   #pManage .av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:13px;color:#fff}
@@ -333,6 +339,8 @@
 <div class="ov" id="memBg"><div class="sheet">
   <h3 id="memTitle"></h3><div class="sub" id="memSub"></div>
   <div id="jrnLevel"></div>
+  <div id="jrnHow"></div>
+  <div id="jrnLadder"></div>
   <div id="memStory"></div>
   <div id="jrnSummary"></div>
   <div class="jhead" id="jrnReflectHead"></div>
@@ -364,7 +372,8 @@ const I18N={
   somethingElse:"Something else here",close:"Close",logged:"Nice — your world noticed 🌱",
   nudgeTxt:c=>`${c} has gone a little quiet. Want a tiny idea to wake it up? (optional)`,nudgeLater:"Not now",nudgeOk:"Show me",
   memTitle:"My week",memSub:"Your moments and how your world has grown — only yours.",worldStory:"How your world has grown",memEmpty:"No photos yet. Add one when you log something 🌱",del:"×",
-  journey:"Journey",jSub:"Your story — your level, what you've built, and space to reflect. Only yours.",jLevel:"Level",jDays:"balanced days",jSummer:"This summer so far",jDaysShort:"days",jReflect:"My reflection",jNotePh:"Write a reflection — how's it going? any ideas?",jPhotos:"My photos",shareYes:"👀 Sharing my week with a parent — tap to stop",shareNo:"🤝 Share my week with a parent",viewJourney:"👀 View journey",notShared:"not shared yet",removeChild:"🗑 Remove this child",removeConfirm:n=>`Remove ${n}? This deletes their world on all devices.`,
+  journey:"Journey",jSub:"Your story — your level, what you've built, and space to reflect. Only yours.",jLevel:"Level",jDays:"balanced days",jSummer:"This summer so far",jDaysShort:"days",jReflect:"My reflection",jNotePh:"Write a reflection — how's it going? any ideas?",jPhotos:"My photos",shareYes:"👀 Sharing my week with a parent — tap to stop",shareNo:"🤝 Share my week with a parent",viewJourney:"👀 View journey",notShared:"not shared yet",
+  howTitle:"🌱 How your world grows",howRule:"Do 3 different things in a day — a different mix than yesterday. That's a balanced day, and balanced days grow your world.",levelsTitle:"Your journey — 10 steps",nextIn:n=>`${n} more balanced ${n===1?"day":"days"}`,allDone:"🎉 Whole journey complete — new seasons coming!",removeChild:"🗑 Remove this child",removeConfirm:n=>`Remove ${n}? This deletes their world on all devices.`,
   manageKids:"Manage children",pinPrompt:"Parent PIN:",pinWrong:"Wrong PIN",pinSet:"🔒 Set a parent PIN",pinChange:"🔒 Change / remove PIN",pinSetPrompt:"Set a parent PIN (leave empty to remove it):",pinSaved:"Parent PIN set.",pinCleared:"Parent PIN removed.",
   lockNote:"📱 = lock THIS device to one child, so siblings can't open each other's world. Set a PIN to make it stick.",lockedMsg:n=>`This device now shows only ${n}. Come back here (Parent) to change it.`,unlockedMsg:"Device unlocked — all children visible.",
   pTitle:"Family view",pLead:"You see how the family is doing — not what each child did. By design.",
@@ -388,7 +397,8 @@ const I18N={
   somethingElse:"Niečo iné tu",close:"Zavrieť",logged:"Super — tvoj svet si to všimol 🌱",
   nudgeTxt:c=>`„${c}" trochu stíchlo. Chceš drobný nápad, ako to zobudiť? (nepovinné)`,nudgeLater:"Teraz nie",nudgeOk:"Ukáž",
   memTitle:"Môj týždeň",memSub:"Tvoje momenty a ako rástol tvoj svet — len tvoje.",worldStory:"Ako rástol tvoj svet",memEmpty:"Zatiaľ žiadne fotky. Pridaj, keď niečo zaznamenáš 🌱",del:"×",
-  journey:"Cesta",jSub:"Tvoj príbeh — tvoja úroveň, čo si postavil a priestor na reflexiu. Len tvoje.",jLevel:"Úroveň",jDays:"vyvážených dní",jSummer:"Toto leto zatiaľ",jDaysShort:"dní",jReflect:"Moja reflexia",jNotePh:"Napíš reflexiu — ako to ide? nejaké nápady?",jPhotos:"Moje fotky",shareYes:"👀 Zdieľam svoj týždeň s rodičom — ťuk = prestať",shareNo:"🤝 Zdieľať svoj týždeň s rodičom",viewJourney:"👀 Pozri Cestu",notShared:"zatiaľ nezdieľané",removeChild:"🗑 Odstrániť dieťa",removeConfirm:n=>`Odstrániť ${n}? Vymaže to jeho svet na všetkých zariadeniach.`,
+  journey:"Cesta",jSub:"Tvoj príbeh — tvoja úroveň, čo si postavil a priestor na reflexiu. Len tvoje.",jLevel:"Úroveň",jDays:"vyvážených dní",jSummer:"Toto leto zatiaľ",jDaysShort:"dní",jReflect:"Moja reflexia",jNotePh:"Napíš reflexiu — ako to ide? nejaké nápady?",jPhotos:"Moje fotky",shareYes:"👀 Zdieľam svoj týždeň s rodičom — ťuk = prestať",shareNo:"🤝 Zdieľať svoj týždeň s rodičom",viewJourney:"👀 Pozri Cestu",notShared:"zatiaľ nezdieľané",
+  howTitle:"🌱 Ako rastie tvoj svet",howRule:"Sprav za deň 3 rôzne veci — inú kombináciu než včera. To je vyvážený deň a vyvážené dni ti rozrastajú svet.",levelsTitle:"Tvoja cesta — 10 krokov",nextIn:n=>`ešte ${n} ${n===1?"vyvážený deň":(n>=2&&n<=4?"vyvážené dni":"vyvážených dní")}`,allDone:"🎉 Celá cesta hotová — čoskoro nové sezóny!",removeChild:"🗑 Odstrániť dieťa",removeConfirm:n=>`Odstrániť ${n}? Vymaže to jeho svet na všetkých zariadeniach.`,
   manageKids:"Správa detí",pinPrompt:"Rodičovský PIN:",pinWrong:"Nesprávny PIN",pinSet:"🔒 Nastaviť rodičovský PIN",pinChange:"🔒 Zmeniť / zrušiť PIN",pinSetPrompt:"Nastav rodičovský PIN (prázdne = zrušiť):",pinSaved:"PIN nastavený.",pinCleared:"PIN zrušený.",
   lockNote:"📱 = uzamkni TOTO zariadenie na jedno dieťa, aby si súrodenci nevedeli otvoriť cudzí svet. Nastav PIN, nech to drží.",lockedMsg:n=>`Toto zariadenie teraz ukazuje len: ${n}. Zmeníš to tu (Rodič).`,unlockedMsg:"Zariadenie odomknuté — všetky deti viditeľné.",
   pTitle:"Pohľad rodiny",pLead:"Vidíš, ako sa darí rodine — nie čo ktoré dieťa robilo. Zámerne.",
@@ -700,6 +710,17 @@ function openMem(target){
   const bd=balancedDays(p);const gp=bd.length;const reached=MILESTONES.filter(m=>gp>=m.at);
   // level
   $("jrnLevel").innerHTML=`<div class="jlvl"><span class="jl-n">${T().jLevel} ${reached.length}</span><span class="jl-d">· ${gp} ${T().jDays}</span></div>`;
+  // rule + ladder of 10 levels (motivation: what's next)
+  $("jrnHow").innerHTML=`<b>${T().howTitle}</b><br>${T().howRule}`;
+  const lad=$("jrnLadder");lad.innerHTML="";
+  const lh=document.createElement("div");lh.className="jhead";lh.textContent=T().levelsTitle;lad.appendChild(lh);
+  let nextShown=false;
+  MILESTONES.forEach(m=>{const done=gp>=m.at;const isNext=!done&&!nextShown;if(isNext)nextShown=true;
+    const lbl=LANG==="sk"?m.sk:m.en;const mark=done?"✓":(isNext?"➡️":"•");
+    const row=document.createElement("div");row.className="lad-row"+(isNext?" next":(done?"":" future"));
+    row.innerHTML=`<span class="lad-ic">${mark}</span><span>${lbl}</span>`+(isNext?`<span class="lad-x">${T().nextIn(m.at-gp)}</span>`:"");
+    lad.appendChild(row);});
+  if(!nextShown){const row=document.createElement("div");row.className="lad-row next";row.textContent=T().allDone;lad.appendChild(row);}
   // timeline (what built, when)
   const st=$("memStory");st.innerHTML="";
   const h=document.createElement("div");h.className="jhead";h.textContent=T().worldStory;st.appendChild(h);
