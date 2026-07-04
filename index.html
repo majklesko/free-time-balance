@@ -451,6 +451,7 @@ let DB=load()||{lang:"en",current:null,nudgeDismissed:{},profiles:[
 if(!DB.current)DB.current=DB.profiles[0].id;
 // ---- Cloudflare sync (Worker + KV) ----
 const API="https://habitat.michal-4ea.workers.dev";
+const BUILD="v8"; // shown in footer so you can confirm the app updated after 🔄
 if(!DB.familyId)DB.familyId="fam-"+Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,8);
 // deep link: ?family=<code> auto-joins that family (shareable via WhatsApp)
 const _fam=new URLSearchParams(location.search).get("family");
@@ -521,7 +522,7 @@ function render(){
   LANG=DB.lang;
   $("brand").textContent=T().brand;$("printLbl").textContent=T().print;
   $("langBtn").textContent=LANG==="en"?"SK":"EN";$("modeLbl").textContent=MODE==="child"?T().parent:T().child;
-  $("memLbl").textContent=T().journey;$("familyLbl").textContent=T().family;$("installLbl").textContent=T().install;$("updateLbl").textContent=T().update;$("moreLbl").textContent=T().more;$("footnote").textContent=T().footnote;
+  $("memLbl").textContent=T().journey;$("familyLbl").textContent=T().family;$("installLbl").textContent=T().install;$("updateLbl").textContent=T().update;$("moreLbl").textContent=T().more;$("footnote").textContent=T().footnote+" · "+BUILD;
   $("ph-title").textContent=T().ph_title;$("ph-sub").textContent=T().ph_sub;
   if(MODE==="parent"){$("childView").style.display="none";$("parentView").style.display="block";
     $("profiles").style.display="none";$("memBtn").style.display="none";$("minBtn").style.display="none";$("strygaBtn").style.display="none";$("who").textContent="";renderParent();return;}
