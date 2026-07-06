@@ -205,6 +205,7 @@
     <div class="brand">🌍 <span id="brand">Habitat</span><span class="dot">.</span></div>
     <div class="spacer"></div>
     <button class="chip" id="memBtn">📖 <span id="memLbl">Journey</span></button>
+    <button class="chip" id="treeBtn">🌳 <span id="treeLbl">Family</span></button>
     <button class="chip" id="moreBtn">⚙️ <span id="moreLbl">More</span></button>
   </header>
   <div class="who" id="who"></div>
@@ -292,6 +293,16 @@
   <button class="close" id="sheetClose"></button>
 </div></div>
 
+<div class="ov" id="famTreeBg"><div class="sheet">
+  <h3 id="ftTitle"></h3>
+  <div id="ftTree" style="text-align:center;margin:4px 0"></div>
+  <div id="ftGrow" style="text-align:center;font-size:14px;color:#3a5a3a;font-weight:600;margin-bottom:12px"></div>
+  <div id="ftGoal" style="background:#f0f8ef;border:1px solid #cfe6cc;border-radius:12px;padding:10px 12px;font-size:13px;cursor:pointer;margin-bottom:14px"></div>
+  <div id="ftSend" style="margin-bottom:8px"></div>
+  <div id="ftReceived"></div>
+  <button class="close" id="ftClose"></button>
+</div></div>
+
 <div class="ov" id="moreBg"><div class="sheet">
   <h3 id="moreTitle"></h3>
   <div class="morelist">
@@ -341,7 +352,10 @@
 const I18N={
  en:{brand:"Habitat",print:"Print",parent:"Parent",child:"Kids",simple:"Simple",world:"World",myweek:"My week",today:"today",
   hello:n=>`Hi ${n} 👋 — this is your world today`,addChild:"＋ Add child",addChildPrompt:"Child's name:",
-  family:"Family",familyMsg:"Link copied ✓",update:"Update",install:"Install",more:"More",moreTitle:"Settings",iosInstall:"On iPhone: tap Share ⬆️ in Safari's bottom bar, then 'Add to Home Screen'.",
+  family:"Family",familyMsg:"Link copied ✓",update:"Update",install:"Install",more:"More",moreTitle:"Settings",
+  treeLbl:"Family",famTreeTitle:"Our family tree 🌳",treeStage:st=>["A tiny sprout — everyone's activities grow it together 🌱","A little sapling 🌿","A young tree 🌳","Growing strong — first blossoms 🌸","In full blossom 🌸🌸","A blossoming grove — birds are visiting! 🐦"][st]||"Blossoming 🌸",
+  famGoal:"Our goal",famGoalNone:"tap to set a shared goal together",famGoalPrompt:"Set a shared family goal (e.g. a blossoming tree this month):",
+  sendCheer:"Send a cheer to…",pickSticker:n=>`Pick a cheer for ${n}:`,cheerSent:n=>`Sent to ${n}! 💛`,cheersForYou:"Cheers for you 💛",noCheers:"No cheers yet — send one to a sibling 💛",cheerFrom:n=>`${n} cheered you`,iosInstall:"On iPhone: tap Share ⬆️ in Safari's bottom bar, then 'Add to Home Screen'.",
   famTitle:"Your family",famSub:"Share this link so your family's phones see the same worlds.",famShareBtn:"📤 Share link",famCopied:"Link copied ✓",famJoinLbl:"Join another family (paste its link or code):",famJoinBtn:"Join",famHint:"👪 Have a family already? Tap here and enter your family code to load your children.",
   cat_home:"Helping at home",cat_space:"My space",cat_family:"Family",cat_friends:"Friends",cat_learn:"Learning",cat_self:"Time for me",cat_sport:"Moving",
   st_vibrant:"thriving",st_ok:"awake",st_sleepy:"sleeping…",
@@ -366,7 +380,10 @@ const I18N={
   activities:{home:["Took out the trash","Emptied the dishwasher","Helped cook","Tidied a shared space"],space:["Tidied my room","Made my bed","Sorted my desk","Vacuumed my space"],family:["Played with my sibling","Helped a family member","Hung out with family","Did something kind at home"],friends:["Met a friend","Called / messaged a friend","Did something fun together","Made a new friend"],learn:["Learned something new","Read","Practiced a skill","Made/built something"],self:["I made time for myself","Did something just for me","Relaxed & recharged"],sport:["Went outside & moved","Played a sport","Walked / biked","Trained"]}},
  sk:{brand:"Habitat",print:"Tlač",parent:"Rodič",child:"Deti",simple:"Jednoducho",world:"Svet",myweek:"Môj týždeň",today:"dnes",
   hello:n=>`Ahoj ${n} 👋 — toto je dnes tvoj svet`,addChild:"＋ Pridaj dieťa",addChildPrompt:"Meno dieťaťa:",
-  family:"Rodina",familyMsg:"Link skopírovaný ✓",update:"Aktualizovať",install:"Inštalovať",more:"Viac",moreTitle:"Nastavenia",iosInstall:"Na iPhone: klikni Zdieľať ⬆️ v spodnej lište Safari a potom 'Pridať na plochu'.",
+  family:"Rodina",familyMsg:"Link skopírovaný ✓",update:"Aktualizovať",install:"Inštalovať",more:"Viac",moreTitle:"Nastavenia",
+  treeLbl:"Rodina",famTreeTitle:"Náš rodinný strom 🌳",treeStage:st=>["Malý klíček — aktivity všetkých ho spolu rozrastajú 🌱","Malý stromček 🌿","Mladý strom 🌳","Silnie — prvé kvety 🌸","V plnom kvete 🌸🌸","Rozkvitnutý háj — prileteli vtáčiky! 🐦"][st]||"Rozkvitá 🌸",
+  famGoal:"Náš cieľ",famGoalNone:"ťuknite a nastavte spoločný cieľ",famGoalPrompt:"Nastav spoločný rodinný cieľ (napr. rozkvitnutý strom tento mesiac):",
+  sendCheer:"Pošli povzbudenie…",pickSticker:n=>`Vyber povzbudenie pre ${n}:`,cheerSent:n=>`Poslané ${n}! 💛`,cheersForYou:"Povzbudenia pre teba 💛",noCheers:"Zatiaľ žiadne — pošli súrodencovi 💛",cheerFrom:n=>`${n} ťa povzbudil/a`,iosInstall:"Na iPhone: klikni Zdieľať ⬆️ v spodnej lište Safari a potom 'Pridať na plochu'.",
   famTitle:"Vaša rodina",famSub:"Pošli tento link, nech telefóny rodiny vidia tie isté svety.",famShareBtn:"📤 Zdieľať link",famCopied:"Link skopírovaný ✓",famJoinLbl:"Pripojiť sa k inej rodine (vlož link alebo kód):",famJoinBtn:"Pripojiť",famHint:"👪 Už máš rodinu? Klikni sem a zadaj rodinný kód, načítajú sa tvoje deti.",
   cat_home:"Pomoc doma",cat_space:"Môj priestor",cat_family:"Rodina",cat_friends:"Kamoši",cat_learn:"Učenie",cat_self:"Čas pre mňa",cat_sport:"Pohyb",
   st_vibrant:"prekvitá",st_ok:"bdie",st_sleepy:"spí…",
@@ -432,7 +449,7 @@ let DB=load()||{lang:"en",current:null,nudgeDismissed:{},profiles:[
 if(!DB.current)DB.current=DB.profiles[0].id;
 // ---- Cloudflare sync (Worker + KV) ----
 const API="https://habitat.michal-4ea.workers.dev";
-const BUILD="v9"; // shown in footer so you can confirm the app updated after 🔄
+const BUILD="v10"; // shown in footer so you can confirm the app updated after 🔄
 if(!DB.familyId)DB.familyId="fam-"+Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,8);
 // deep link: ?family=<code> auto-joins that family (shareable via WhatsApp)
 const _fam=new URLSearchParams(location.search).get("family");
@@ -503,7 +520,7 @@ function render(){
   LANG=DB.lang;
   $("brand").textContent=T().brand;$("printLbl").textContent=T().print;
   $("langBtn").textContent=LANG==="en"?"SK":"EN";$("modeLbl").textContent=MODE==="child"?T().parent:T().child;
-  $("memLbl").textContent=T().journey;$("familyLbl").textContent=T().family;$("installLbl").textContent=T().install;$("updateLbl").textContent=T().update;$("moreLbl").textContent=T().more;$("footnote").textContent=T().footnote+" · "+BUILD;
+  $("memLbl").textContent=T().journey;$("familyLbl").textContent=T().family;$("installLbl").textContent=T().install;$("updateLbl").textContent=T().update;$("moreLbl").textContent=T().more;$("treeLbl").textContent=T().treeLbl;$("footnote").textContent=T().footnote+" · "+BUILD;
   $("ph-title").textContent=T().ph_title;$("ph-sub").textContent=T().ph_sub;
   if(MODE==="parent"){$("childView").style.display="none";$("parentView").style.display="block";
     $("profiles").style.display="none";$("memBtn").style.display="none";$("minBtn").style.display="none";$("strygaBtn").style.display="none";$("who").textContent="";renderParent();return;}
@@ -735,6 +752,49 @@ function openMem(target){
   $("memBg").classList.add("show");
 }
 
+/* ===================== family tree + cheers + shared goal (cooperative) ===================== */
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+const familyGrowth=()=>DB.profiles.reduce((s,p)=>s+growth(p),0); // pooled, no per-child split ever shown
+function familyStage(){const g=familyGrowth();return g<=0?0:g<3?1:g<7?2:g<14?3:g<24?4:5;}
+function familyTreeSVG(st){
+  if(st===0)return `<svg viewBox="-50 -70 100 110" width="180" height="198"><ellipse cx="0" cy="36" rx="34" ry="6" fill="#a6d99c"/><rect x="-2.5" y="6" width="5" height="30" rx="2.5" fill="#7cae5f"/><ellipse cx="-11" cy="8" rx="12" ry="7" fill="#8fd08a" transform="rotate(-22 -11 8)"/><ellipse cx="11" cy="8" rx="12" ry="7" fill="#8fd08a" transform="rotate(22 11 8)"/></svg>`;
+  const R=[0,18,28,40,46,52][st];
+  const trunk=`<rect x="-8" y="-4" width="16" height="52" rx="7" fill="#9a6a44"/>`;
+  const canopy=`<circle cx="0" cy="-8" r="${R}" fill="#86c982"/><circle cx="${(-R*0.62).toFixed(1)}" cy="6" r="${(R*0.72).toFixed(1)}" fill="#79c178"/><circle cx="${(R*0.62).toFixed(1)}" cy="6" r="${(R*0.72).toFixed(1)}" fill="#79c178"/><circle cx="0" cy="${(-R*0.75).toFixed(1)}" r="${(R*0.72).toFixed(1)}" fill="#8fd08a"/>`;
+  let bl="";if(st>=3){const pts=[[-22,-18],[20,-24],[0,-42],[-32,6],[28,0],[12,-14],[-10,-32],[6,-28],[-18,-6]];bl=pts.slice(0,st>=4?9:4).map(a=>`<circle cx="${a[0]}" cy="${a[1]-6}" r="3.6" fill="#ffb6d5"/>`).join("");}
+  let birds="";if(st>=5)birds='<path d="M-44,-56 q5,-6 10,0 q5,-6 10,0" stroke="#5a6473" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M28,-64 q5,-6 10,0 q5,-6 10,0" stroke="#5a6473" stroke-width="1.8" fill="none" stroke-linecap="round"/>';
+  return `<svg viewBox="-70 -90 140 160" width="230" height="263"><ellipse cx="0" cy="50" rx="46" ry="7" fill="#a6d99c"/>${trunk}${canopy}${bl}${birds}</svg>`;
+}
+async function openFamTree(){
+  const p=cur();const st=familyStage();
+  $("ftTitle").textContent=T().famTreeTitle;$("ftClose").textContent=T().close;
+  $("ftTree").innerHTML=familyTreeSVG(st);$("ftGrow").textContent=T().treeStage(st);
+  DB.cheerSeen=Date.now();$("treeBtn").classList.remove("on");localStorage.setItem(LS_KEY,JSON.stringify(DB));
+  let meta={};try{const r=await fetch(`${API}/f/${DB.familyId}/meta`);meta=await r.json();}catch(e){}
+  $("ftGoal").innerHTML=`<b>${T().famGoal}:</b> ${meta.goal?escapeHtml(meta.goal):`<span style="color:#9aa3b2">${T().famGoalNone}</span>`}`;
+  $("ftGoal").onclick=async()=>{const v=prompt(T().famGoalPrompt,meta.goal||"");if(v===null)return;try{await fetch(`${API}/f/${DB.familyId}/meta`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({goal:v.trim()})});}catch(e){}openFamTree();};
+  renderSendCheer(null);
+  let cheers=[];try{const r=await fetch(`${API}/f/${DB.familyId}/cheers`);const d=await r.json();cheers=d.cheers||[];}catch(e){}
+  const mine=cheers.filter(c=>c.to===p.id).sort((a,b)=>(b.date||0)-(a.date||0)).slice(0,10);
+  const rc=$("ftReceived");rc.innerHTML=`<div class="jhead">${T().cheersForYou}</div>`;
+  if(!mine.length)rc.innerHTML+=`<div class="mem-empty" style="padding:8px 0">${T().noCheers}</div>`;
+  else mine.forEach(c=>{const fromN=(DB.profiles.find(x=>x.id===c.from)||{}).name||"👤";const row=document.createElement("div");row.className="story-row";row.innerHTML=`<span class="si">${c.sticker||"👏"}</span><span>${escapeHtml(T().cheerFrom(fromN))}</span>`;rc.appendChild(row);});
+  $("famTreeBg").classList.add("show");
+}
+function renderSendCheer(forSib){
+  const box=$("ftSend");box.innerHTML="";const p=cur();const sibs=DB.profiles.filter(x=>x.id!==p.id);
+  if(!sibs.length)return;
+  const h=document.createElement("div");h.className="lblmini";box.appendChild(h);
+  if(!forSib){h.textContent=T().sendCheer;sibs.forEach(s=>{const b=document.createElement("button");b.className="chip";b.style.cssText="margin:4px 6px 0 0";b.textContent=s.name;b.onclick=()=>renderSendCheer(s);box.appendChild(b);});}
+  else{h.textContent=T().pickSticker(forSib.name);["💪","❤️","⭐","🎉","🌈","👏"].forEach(s=>{const b=document.createElement("button");b.className="chip";b.style.cssText="font-size:20px;margin:4px";b.textContent=s;b.onclick=()=>sendCheer(forSib,s);box.appendChild(b);});}
+}
+async function sendCheer(sib,sticker){
+  const p=cur();try{await fetch(`${API}/f/${DB.familyId}/cheer`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({to:sib.id,from:p.id,sticker,date:Date.now()})});}catch(e){}
+  toast(T().cheerSent(sib.name));renderSendCheer(null);
+}
+async function checkCheers(){if(!API)return;try{const r=await fetch(`${API}/f/${DB.familyId}/cheers`);const d=await r.json();const p=cur();
+  const fresh=(d.cheers||[]).some(c=>c.to===p.id&&(c.date||0)>(DB.cheerSeen||0));$("treeBtn").classList.toggle("on",fresh);}catch(e){}}
+
 /* ===================== parent (coarse, firewalled) ===================== */
 function renderParent(){
   $("pTitle").textContent=T().pTitle;$("pLead").textContent=T().pLead;$("firewall").textContent=T().firewall;
@@ -770,6 +830,8 @@ $("minBtn").onclick=()=>{const p=cur();p.minimal=!p.minimal;save();render();};
 $("strygaBtn").onclick=()=>{const p=cur();p.stryga=(p.stryga===false);save();render();};
 $("printBtn").onclick=()=>window.print();
 $("memBtn").onclick=()=>openMem();
+$("treeBtn").onclick=()=>openFamTree();
+$("ftClose").onclick=()=>$("famTreeBg").classList.remove("show");
 $("moreBtn").onclick=()=>{$("moreTitle").textContent=T().moreTitle;$("moreBg").classList.add("show");};
 $("moreClose").onclick=()=>$("moreBg").classList.remove("show");
 $("moreBg").addEventListener("click",e=>{const b=e.target.closest("button");if(b&&b.id!=="moreClose")setTimeout(()=>$("moreBg").classList.remove("show"),80);});
@@ -787,7 +849,7 @@ $("famJoinBtn").onclick=()=>{const v=$("famJoinInput").value||"";const m=v.match
   if(code&&code.length>=12&&code!==DB.familyId){DB.familyId=code;save();$("famBg").classList.remove("show");syncPull();}};
 $("famClose").onclick=()=>$("famBg").classList.remove("show");
 $("sheetClose").onclick=closeSheet;$("memClose").onclick=()=>$("memBg").classList.remove("show");
-["sheetBg","memBg","famBg","moreBg"].forEach(id=>$(id).onclick=e=>{if(e.target===$(id))$(id).classList.remove("show");});
+["sheetBg","memBg","famBg","moreBg","famTreeBg"].forEach(id=>$(id).onclick=e=>{if(e.target===$(id))$(id).classList.remove("show");});
 
 /* demo seed — 10 varied balanced days (no same trio two days running) + partial today */
 if(!DB._seeded){
@@ -801,13 +863,13 @@ if(!DB._seeded){
   Z.forEach((c,i)=>add("mia",i+1,c)); add("mia",0,["family"]); // 6yo: fewer, today 1/3
   DB._seeded=true;save();
 }
-render();ensureScenery();syncPull();
+render();ensureScenery();syncPull();checkCheers();
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("sw.js").then(r=>{try{r.update();}catch(e){}}).catch(()=>{});
   let _refreshing=false;
   navigator.serviceWorker.addEventListener("controllerchange",()=>{if(_refreshing)return;_refreshing=true;location.reload();});
   // check for a newer version when app returns to foreground (iOS-friendly)
-  document.addEventListener("visibilitychange",()=>{if(!document.hidden){navigator.serviceWorker.getRegistration().then(r=>r&&r.update()).catch(()=>{});syncPull();}});
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden){navigator.serviceWorker.getRegistration().then(r=>r&&r.update()).catch(()=>{});syncPull();checkCheers();}});
 }
 $("updateBtn").onclick=async()=>{
   try{const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}catch(e){}
