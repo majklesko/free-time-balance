@@ -87,6 +87,10 @@
   .zone .lbl{position:relative;font-size:11.5px;font-weight:700;margin-top:3px;color:#2c3344}
   .zone .st{position:relative;font-size:10px;color:#5d6677;min-height:12px}
   .zone.vibrant .blob{animation:wobble 5s ease-in-out infinite}.zone.vibrant .ico{animation:pop 5s ease-in-out infinite}
+  .peek{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);z-index:9;border:none;background:rgba(255,255,255,.82);backdrop-filter:blur(4px);width:50px;height:50px;border-radius:50%;font-size:22px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.16);transition:transform .2s}
+  .peek:hover{transform:translate(-50%,-50%) scale(1.08)}
+  .stage.peeking .zone{opacity:0!important;pointer-events:none;transition:opacity .5s ease}
+  .stage.peeking .peek{background:#f6a623;color:#fff}
   .zone.sleepy{filter:grayscale(.8);opacity:.6}.zone.sleepy .zzz{position:absolute;top:6px;right:14px;font-size:12px;color:#98a1b2;animation:drift 3.2s infinite}
   @keyframes wobble{0%,100%{border-radius:46% 54% 52% 48%/52% 46% 54% 48%}50%{border-radius:54% 46% 48% 52%/46% 54% 48% 52%}}
   @keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
@@ -264,6 +268,7 @@
       <div class="mbuild" id="mb-castle" style="left:50%;bottom:33%"><svg width="86" height="60" viewBox="-30 -40 60 42"><rect x="-22" y="-22" width="44" height="22" fill="#dcd5c6" stroke="#b3a892"/><rect x="-27" y="-30" width="10" height="30" fill="#cfc7b6" stroke="#b3a892"/><rect x="17" y="-30" width="10" height="30" fill="#cfc7b6" stroke="#b3a892"/><rect x="-27" y="-34" width="3" height="5" fill="#b3a892"/><rect x="-21" y="-34" width="3" height="5" fill="#b3a892"/><rect x="20" y="-34" width="3" height="5" fill="#b3a892"/><rect x="24" y="-34" width="3" height="5" fill="#b3a892"/><rect x="-3" y="-12" width="6" height="12" fill="#8a6a44"/><g class="flag" transform="translate(22,-38)"><rect x="0" y="0" width=".9" height="9" fill="#7a6a4a"/><path class="flagcloth" d="M.9,0 L7,2 L.9,4 Z" fill="#ff7a90"/></g></svg></div>
       <div id="buddy"></div>
       <div id="buddy2"></div>
+      <button id="peekBtn" class="peek" title="See your world">🏞️</button>
     </div>
     <div id="mlist" class="mlist" style="display:none"></div>
     <div class="nudge" id="nudge" style="display:none">
@@ -449,7 +454,7 @@ let DB=load()||{lang:"en",current:null,nudgeDismissed:{},profiles:[
 if(!DB.current)DB.current=DB.profiles[0].id;
 // ---- Cloudflare sync (Worker + KV) ----
 const API="https://habitat.michal-4ea.workers.dev";
-const BUILD="v10"; // shown in footer so you can confirm the app updated after 🔄
+const BUILD="v11"; // shown in footer so you can confirm the app updated after 🔄
 if(!DB.familyId)DB.familyId="fam-"+Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,8);
 // deep link: ?family=<code> auto-joins that family (shareable via WhatsApp)
 const _fam=new URLSearchParams(location.search).get("family");
@@ -832,6 +837,9 @@ $("printBtn").onclick=()=>window.print();
 $("memBtn").onclick=()=>openMem();
 $("treeBtn").onclick=()=>openFamTree();
 $("ftClose").onclick=()=>$("famTreeBg").classList.remove("show");
+let peekTimer=null;
+$("peekBtn").onclick=()=>{const s=$("stage");const on=s.classList.toggle("peeking");$("peekBtn").textContent=on?"🫧":"🏞️";
+  clearTimeout(peekTimer);if(on)peekTimer=setTimeout(()=>{s.classList.remove("peeking");$("peekBtn").textContent="🏞️";},5000);};
 $("moreBtn").onclick=()=>{$("moreTitle").textContent=T().moreTitle;$("moreBg").classList.add("show");};
 $("moreClose").onclick=()=>$("moreBg").classList.remove("show");
 $("moreBg").addEventListener("click",e=>{const b=e.target.closest("button");if(b&&b.id!=="moreClose")setTimeout(()=>$("moreBg").classList.remove("show"),80);});
